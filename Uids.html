@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slice UID Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        textarea {
+            width: 97%;
+            height: 150px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: none;
+        }
+
+        input[type="number"] {
+            width: 97%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .copy-btn {
+            background: #007BFF;
+        }
+
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 480px) {
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            textarea {
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Slice UID Tool</h2>
+        <textarea id="uids" placeholder="Paste UIDs here..."></textarea>
+        <input type="number" id="sliceCount" placeholder="Enter slice count" min="1">
+        <div class="button-group">
+            <button onclick="sliceUIDs()">Slice</button>
+            <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+        </div>
+        <textarea id="result" readonly placeholder="Result will appear here..."></textarea>
+    </div>
+
+    <script>
+        let uids = [];
+
+        function sliceUIDs() {
+            // Ambil nilai dari textarea jika `uids` kosong
+            if (uids.length === 0) {
+                uids = document.getElementById('uids').value.trim().split(/\n+/);
+            }
+
+            const sliceCount = parseInt(document.getElementById('sliceCount').value);
+            const resultTextarea = document.getElementById('result');
+
+            if (!sliceCount || sliceCount <= 0) {
+                alert('Please enter a valid slice count.');
+                return;
+            }
+
+            if (uids.length === 0) {
+                alert('No more UIDs to slice.');
+                return;
+            }
+
+            // Ambil UID yang akan di-slice
+            const currentSlice = uids.splice(0, sliceCount).join('\n');
+
+            // Tampilkan hasil slice
+            resultTextarea.value = currentSlice;
+
+            // Perbarui textarea dengan UID yang tersisa
+            document.getElementById('uids').value = uids.join('\n');
+        }
+
+        function copyToClipboard() {
+            const resultTextarea = document.getElementById('result');
+            const textToCopy = resultTextarea.value;
+
+            if (!textToCopy) {
+                alert('No result to copy.');
+                return;
+            }
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                console.log('Result copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
