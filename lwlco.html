@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Prefix Link - Retro Style</title>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a1a2e;
+            color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        textarea {
+            width: 90%;
+            height: 150px;
+            margin-bottom: 10px;
+            background-color: #0f3460;
+            color: #f0f0f0;
+            border: 2px solid #e94560;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #e94560;
+            border: none;
+            color: white;
+            font-size: 14px;
+            font-family: 'Press Start 2P', cursive;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #ff2e63;
+        }
+        h2, h3 {
+            color: #00adb5;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h2>Tambah Prefix ke Banyak Link</h2>
+    <textarea id="inputLinks" placeholder="Masukkan satu link per baris..."></textarea>
+    <br>
+    <button onclick="processLinks()">Tambahkan Prefix</button>
+    <h3>Hasil:</h3>
+    <textarea id="outputLinks" readonly></textarea>
+    <br>
+    <button id="info" onclick="copyToClipboard()">Salin Hasil</button>
+    
+    <script>
+        function processLinks() {
+            let input = document.getElementById("inputLinks").value;
+            let links = input.split("\n").map(link => link.trim()).filter(link => link);
+            let output = links.map(link => `https://l.wl.co/l?u=${link}`).join("\n");
+            document.getElementById("outputLinks").value = output;
+        }
+        
+        function copyToClipboard() {
+            let output = document.getElementById("outputLinks");
+            let info = document.getElementById("info");
+            output.select();
+            document.execCommand("copy");
+            info.textContent="Sukses"
+            setTimeout(()=>{
+                info.textContent="Salin Hasil"
+            },1000)
+        }
+    </script>
+</body>
+</html>
