@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caption Generator</title>
+  <style>
+    :root {
+      --bg-color: #1b1b2f;
+      --card-bg: #162447;
+      --accent-color: #e43f5a;
+      --accent-hover: #ff4757;
+      --text-color: #ffffff;
+      --input-bg: #1f4068;
+      --font-family: 'Arial', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      flex-direction: column;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .toggle-buttons button {
+      background: var(--accent-color);
+      color: var(--text-color);
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .toggle-buttons button:hover {
+      background: var(--accent-hover);
+      transform: scale(1.1);
+      box-shadow: 0 5px 15px rgba(255, 71, 87, 0.5);
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 25px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5);
+    }
+
+    input, select, button, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    input, select, textarea {
+      background: var(--input-bg);
+      color: var(--text-color);
+    }
+
+    textarea {
+      resize: none;
+      height: 100px;
+    }
+
+    button:hover {
+      background: var(--accent-hover);
+      transform: scale(1.05);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Notification popup */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-color);
+      color: var(--text-color);
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(255, 71, 87, 0.5);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1000;
+    }
+
+    .notification.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      font-size: 0.8rem;
+      margin-top: 30px;
+      text-align: center;
+      color: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+  <h1>🔥Caption Generator🔥</h1>
+
+  <div class="toggle-buttons">
+    <button onclick="toggleLayer('addLayer')">➕ Add Caption</button>
+    <button onclick="toggleLayer('getLayer')">🎉 Get Caption</button>
+  </div>
+
+  <div class="container">
+    <div id="addLayer" class="card hidden">
+      <textarea type="text" id="newCaption" placeholder="📝 Enter a new caption..."></textarea>
+      <select id="category">
+        <option value="status">🐍 Status</option>
+        <option value="onlink">🔗 OnLink</option>
+        <option value="onbio">👉👌 OnBio</option>
+        <option value="bio">💘 Bioo</option>
+      </select>
+      <button onclick="addCaption()">✅ Add Caption</button>
+    </div>
+
+    <div id="getLayer" class="card hidden">
+      <select id="getCategory">
+        <option value="status">🐍 Status</option>
+        <option value="onlink">🔗 Onlink</option>
+        <option value="onbio">👉👌 OnBio</option>
+        <option value="bio">💘 Bioo</option>
+      </select>
+      <button onclick="getRandomCaption()">🎉 Get Random Caption</button>
+      <textarea id="captionDisplay" readonly></textarea>
+      <button id="copyButton" class="hidden" onclick="copyCaption()">📋 Copy Caption</button>
+      <textarea id="urlInput" placeholder="Input Link mu gok..."></textarea>
+    </div>
+  </div>
+
+  <div id="notification" class="notification"></div>
+
+  <footer>Made with ❤️ FOXTEAM</footer>  
+  <script>
+    const workerUrl = "https://captiongen.kentudiair89.workers.dev";
+    let url = [];
+  
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.innerText = message;
+      notification.classList.add('show');
+      setTimeout(() => notification.classList.remove('show'), 1000);
+    }
+  
+    function toggleLayer(layerId) {
+      document.getElementById('addLayer').classList.add('hidden');
+      document.getElementById('getLayer').classList.add('hidden');
+      document.getElementById(layerId).classList.remove('hidden');
+    }
+  
+    function addCaption() {
+      const newCaption = document.getElementById('newCaption').value;
+      const category = document.getElementById('category').value;
+  
+      if (!newCaption) {
+        showNotification('Please enter a caption!');
+        return;
+      }
+  
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${workerUrl}/add`, true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 201) {
+            showNotification('Caption added successfully!');
+            document.getElementById('newCaption').value = '';
+          } else {
+            showNotification('Failed to add caption');
+          }
+        }
+      };
+  
+      const data = JSON.stringify({ caption: newCaption, category });
+      xhr.send(data);
+    }
+  
+    function genlink() {
+      const urlInput = document.getElementById('urlInput').value.trim();
+      url = urlInput.split('\n').filter(link => link.trim() !== '');
+    }
+  
+    function getRandomCaption() {
+      const category = document.getElementById('getCategory').value;
+  
+      if (category === 'onlink' && url.length === 0) {
+        genlink();
+      }
+  
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `${workerUrl}/random?category=${category}`, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          const captionDisplay = document.getElementById('captionDisplay');
+          const copyButton = document.getElementById('copyButton');
+  
+          if (xhr.status === 200) {
+            let caption = xhr.responseText;
+            if (category === 'onlink' && url.length > 0) {
+              const selectedUrl = url.shift();
+              caption = `${caption}${selectedUrl}`;
+              document.getElementById('urlInput').value = url.join('\n');
+            }
+            captionDisplay.value = caption;
+            copyButton.classList.remove('hidden');
+          } else {
+            captionDisplay.value = 'No captions found!';
+            copyButton.classList.add('hidden');
+          }
+        }
+      };
+      xhr.send();
+    }
+  
+    function copyCaption() {
+      const caption = document.getElementById('captionDisplay').value;
+      if (!caption) return;
+      navigator.clipboard.writeText(caption)
+        .then(() => showNotification('Caption copied to clipboard!'))
+        .catch(() => showNotification('Failed to copy caption'));
+    }
+  </script>
+  
+</body>
+</html>
