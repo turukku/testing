@@ -64,7 +64,7 @@
         
         <div class="options">
             <input type="checkbox" id="use_custom_alias" name="use_custom_alias">
-            <label for="use_custom_alias">l.wl.co</label>
+            <label for="use_custom_alias">Gunakan Alias Kustom (l.wl.co)</label>
         </div>
         
         <button type="button" id="shorten-button" class="button">Shorten URLs</button>
@@ -81,52 +81,79 @@
 
 <script>
     document.getElementById("shorten-button").addEventListener("click", async function () {
-    const urls = document.getElementById("urls").value.trim().split("\n");
-    const output = document.getElementById("output");
-    const useCustomAlias = document.getElementById("use_custom_alias").checked;
-    output.value = "Memproses...\n";
-    
-    if (urls.length === 0 || urls[0] === "") {
-        output.value = "Masukkan setidaknya satu URL.";
-        return;
-    }
-    
-    const apiKey = "HrzQ1~2znhymsI6zwlX3iEnjGa50llynJJkcCkSF"; // Ganti dengan API Key clcr.me kamu
-    const endpoint = "https://clcr.me/api/v2/action/shorten";
-    let results = [];
-    
-    for (let url of urls) {
-        url = url.trim();
-        if (url === "") continue;
-        
-        try {
-            const response = await fetch(endpoint, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${apiKey}`
-                },
-                body: JSON.stringify({ url: url })
-            });
-            
-            const data = await response.json();
-            if (data && data.shortenedUrl) {
-                let shortenedUrl = data.shortenedUrl;
-                if (useCustomAlias) {
-                    shortenedUrl = `https://l.wl.co/l?u=${shortenedUrl}`;
+        const urls = document.getElementById("urls").value.trim().split("\n");
+        const output = document.getElementById("output");
+        const useCustomAlias = document.getElementById("use_custom_alias").checked;
+
+        // Clear output and show processing message
+        output.value = "Memproses...\n";
+
+        // Validate input
+        if (urls.length === 0 || urls.every(url => url.trim() === "")) {
+            output.value = "Masukkan setidaknya satu URL yang valid.";
+            return;
+        }
+
+        const workerUrl = "https://clcrme.kentudiair89.workers.dev"; // Replace with your worker URL
+        let results = [];
+
+        for (let url of urls) {
+            url = url.trim();
+            if (url === "") continue;
+
+            try {
+                // Validate URL format
+                if (!isValidUrl(url)) {
+                    results.push(`${url} -> Error: URL tidak valid`);
+                    continue;
                 }
-                results.push(`${url} -> ${shortenedUrl}`);
-            } else {
-                results.push(`${url} -> Gagal memendekkan`);
+
+                const response = await fetch(workerUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ url: url })
+                });
+
+                if (!response.ok) {
+                    results.push(`${url} -> Error: Gagal memendekkan (HTTP ${response.status})`);
+                    continue;
+                }
+
+                const data = await response.json();
+                if (data && data.shortenedUrl) {
+                    let shortenedUrl = data.shortenedUrl;
+                    if (useCustomAlias) {
+                        try {
+                            shortenedUrl = `https://l.wl.co/l?u=${encodeURIComponent(shortenedUrl)}`;
+                        } catch (e) {
+                            results.push(`${url} -> Error: Gagal menambahkan alias kustom`);
+                            continue;
+                        }
+                    }
+                    results.push(`${url} -> ${shortenedUrl}`);
+                } else {
+                    results.push(`${url} -> Error: Respon API tidak valid`);
+                }
+            } catch (error) {
+                results.push(`${url} -> Error: ${error.message}`);
             }
-        } catch (error) {
-            results.push(`${url} -> Error: ${error.message}`);
+        }
+
+        // Update output with results
+        output.value = results.join("\n---\n"); // Add separators for clarity
+    });
+
+    // Helper function to validate URL format
+    function isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch (e) {
+            return false;
         }
     }
-    
-    output.value = results.join("\n");
-});
-
 </script>
 
 </body>
