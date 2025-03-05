@@ -94,7 +94,7 @@
         return;
     }
 
-    const workerUrl = "https://clcrme.kentudiair89.workers.dev"; // Replace with your worker URL
+    const workerUrl = "https://clcrme.kentudiair89.workers.dev/"; // Replace with your worker URL
     let results = [];
 
     for (let url of urls) {
@@ -107,6 +107,8 @@
                 results.push(`${url} -> Error: URL tidak valid`);
                 continue;
             }
+
+            console.log("Sending request to worker:", { url }); // Debugging
 
             const response = await fetch(workerUrl, {
                 method: "POST",
