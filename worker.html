@@ -1,133 +1,314 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cloudflare Worker Deployer</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e2e;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
+      body {
+        font-family: "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+        background-color: #f0f2f5; /* Light gray background */
+        color: #333; /* Dark gray text */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box; /* Include padding in element's total width and height */
+      }
+
+      .container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
+        width: 90%;
+        max-width: 550px; /* Slightly wider for better layout */
+        box-sizing: border-box;
+        border: 1px solid #e0e0e0; /* Subtle border */
+      }
+
+      h2 {
+        text-align: center;
+        color: #2c3e50; /* Darker blue-gray for heading */
+        margin-bottom: 25px;
+        font-size: 1.8em;
+        font-weight: 600;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: #555;
+        font-size: 0.95em;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="password"],
+      textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        color: #333;
+        font-size: 1em;
+        box-sizing: border-box; /* Crucial for full width with padding */
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      input:focus,
+      textarea:focus {
+        border-color: #007bff; /* Blue focus highlight */
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25); /* Soft glow on focus */
+        outline: none;
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      button {
+        background-color: #007bff; /* Primary blue button */
+        color: #ffffff;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        width: 100%;
+        margin-top: 15px;
+        font-size: 1.05em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px); /* Slight lift effect */
+      }
+
+      button:active {
+        background-color: #004085; /* Even darker on click */
+        transform: translateY(0); /* Reset lift */
+      }
+
+      button:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      #workerUrl {
+        font-weight: 600;
+        color: #007bff;
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.95em;
+        word-break: break-all;
+        padding: 10px;
+        background-color: #e9f5ff; /* Light blue background for URL */
+        border-radius: 8px;
+        border: 1px dashed #a8d7ff; /* Dashed border for visual distinction */
+      }
+
+      /* Progress Bar */
+      #progressBar {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 20px;
+        height: 10px; /* Slimmer progress bar */
+      }
+
+      #progress {
+        height: 100%;
+        background-color: #28a745; /* Green for success */
+        width: 0;
+        border-radius: 8px;
+        transition: width 0.3s ease-in-out;
+      }
+
+      /* Toast Notification */
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #28a745; /* Green for success toast */
+        color: #fff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        font-size: 0.9em;
+        z-index: 1000;
+        animation: slideIn 0.5s forwards, fadeOut 0.5s forwards 2.5s;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
         }
-        .container {
-            background-color: #282a36;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(0, 255, 255, 0.2);
-            width: 90%;
-            max-width: 500px;
+        to {
+          transform: translateX(0);
+          opacity: 1;
         }
-        h2 {
-            text-align: center;
-            color: #00ffff;
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
         }
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
+        to {
+          opacity: 0;
         }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: none;
-            background-color: #1e1e1e;
-            color: #00ffcc;
-        }
-        textarea {
-            resize: none;
-        }
-        button {
-            background-color: #00ffff;
-            color: #1e1e2e;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            width: 100%;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #00cccc;
-        }
-        #workerUrl {
-            font-weight: bold;
-            color: #00ffcc;
-            text-align: center;
-            margin-top: 10px;
-        }
-        /* Progress Bar */
-        #progressBar {
-            width: 100%;
-            background-color: #555;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-        #progress {
-            height: 20px;
-            background-color: #00ffcc;
-            width: 0;
-        }
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: #00ff99;
-            color: #1e1e2e;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.5);
-            display: none;
-        }
-        /* Checkbox Style */
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-        }
-        .checkbox-container input {
-            margin-right: 5px;
-            margin-left: 0; /* Menghapus margin kiri untuk sejajar dengan label */
-        }
+      }
+
+      /* Checkbox Style */
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        margin-top: 15px;
+        font-size: 0.95em;
+        color: #555;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        margin-right: 8px;
+        width: 18px; /* Standard size */
+        height: 18px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        cursor: pointer;
+        vertical-align: middle; /* Align with text */
+        appearance: none; /* Hide default checkbox */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        position: relative;
+        background-color: #f9f9f9;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+
+      .checkbox-container input[type="checkbox"]:checked::after {
+        content: "✔";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: white;
+        font-size: 14px;
+      }
+
+      .checkbox-container label {
+        margin-bottom: 0;
+        cursor: pointer;
+      }
+
+      textarea[readonly] {
+        background-color: #f0f0f0;
+        cursor: default;
+        color: #555;
+        border-color: #e0e0e0;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 0.85em;
+        color: #777;
+        text-align: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Cloudflare Worker Deployer</h2>
 
-<div class="container">
-    <h2>Cloudflare Worker Deployer</h2>
-    <label for="accountId">Account ID:</label>
-    <input type="text" id="accountId" placeholder="Masukkan Account ID di sini">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input
+          type="text"
+          id="accountId"
+          placeholder="Masukkan Cloudflare Account ID Anda"
+        />
+      </div>
 
-    <label for="apiToken">API Key:</label>
-    <input type="text" id="apiToken" placeholder="Masukkan API Key di sini">
+      <div class="form-group">
+        <label for="apiToken">API Key:</label>
+        <input
+          type="password"
+          id="apiToken"
+          placeholder="Masukkan Cloudflare API Key Anda"
+        />
+      </div>
 
-    <label for="workerTitle">Judul:</label>
-    <input type="text" id="workerTitle" placeholder="Masukkan judul di sini">
+      <div class="form-group">
+        <label for="workerTitle">Judul Worker:</label>
+        <input
+          type="text"
+          id="workerTitle"
+          placeholder="Misal: Live Chat Online"
+        />
+      </div>
 
-    <label for="workerDescription">Deskripsi:</label>
-    <input type="text" id="workerDescription" placeholder="Masukkan deskripsi di sini">
+      <div class="form-group">
+        <label for="workerDescription">Deskripsi Worker (Opsional):</label>
+        <input
+          type="text"
+          id="workerDescription"
+          placeholder="Deskripsi singkat untuk worker Anda"
+        />
+      </div>
 
-    <label for="redirectUrl">URL Redirect:</label>
-    <input type="text" id="redirectUrl" placeholder="Masukkan URL redirect di sini">
+      <div class="form-group">
+        <label for="redirectUrl">URL Redirect:</label>
+        <input
+          type="text"
+          id="redirectUrl"
+          placeholder="Misal: https://example.com/halaman-live-chat"
+        />
+      </div>
 
-    <label for="imageUrl">URL Gambar:</label>
-    <input type="text" id="imageUrl" placeholder="Masukkan URL gambar di sini">
+      <div class="form-group">
+        <label for="imageUrl">URL Gambar (Open Graph Image):</label>
+        <input
+          type="text"
+          id="imageUrl"
+          placeholder="Misal: https://i.postimg.cc/Y2sggFv1/sf651s5f.jpg (untuk thumbnail link)"
+        />
+      </div>
 
-    <label for="deployCount">Jumlah Deploy:</label>
-    <input type="number" id="deployCount" value="1" min="1" placeholder="Masukkan jumlah deploy">
+      <div class="form-group">
+        <label for="deployCount">Jumlah Deploy:</label>
+        <input
+          type="number"
+          id="deployCount"
+          value="1"
+          min="1"
+          max="10"
+          placeholder="Berapa worker yang ingin Anda deploy?"
+        />
+      </div>
 
-    <!--<label for="workerCode">Kode Worker:</label>-->
-    <textarea id="workerCode" hidden placeholder="Masukkan kode worker di sini">
+      <textarea id="workerCode" class="hidden">
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event.request))
 })
@@ -137,15 +318,15 @@ async function handleRequest(request) {
   <html>
   <head>
     <title>𝕃𝕀𝕍𝔼 ℂℍ𝔸𝕋 ℍ𝔼ℝ𝔼</title>
-    <meta property="og:image" content="https://i.postimg.cc/Y2sggFv1/sf651s5f.jpg" />
-    <meta property="og:image:secure_url" content="https://i.postimg.cc/Y2sggFv1/sf651s5f.jpg" />
+    <meta property="og:image" content="https://i.imghippo.com/files/JfZ8270WmY.jpg" />
+    <meta property="og:image:secure_url" content="https://i.imghippo.com/files/JfZ8270WmY.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="341" />
     <meta property="og:image:height" content="594" />
     <meta property="og:image:alt" content="On free live cams NOW!!!!" />
     
     <script type="text/JavaScript">
-      location.replace('https://google.com/');
+      location.replace('https://wongetekocak.blogspot.com/');
     </script>
   </head>
   
@@ -159,120 +340,804 @@ async function handleRequest(request) {
     headers: { 'Content-Type': 'text/html' },
   });
 }
-    </textarea>
+    </textarea
+      >
 
-    <button id="deployButton">Deploy Worker</button>
+      <button id="deployButton">Deploy Worker</button>
 
+      <div class="checkbox-container">
+        <input type="checkbox" id="shortenUrlCheckbox" />
+        <label for="shortenUrlCheckbox"
+          >Gunakan l.wl.co untuk memperpendek URL</label
+        >
+      </div>
 
-    <div class="checkbox-container">
-        <input type="checkbox" id="shortenUrlCheckbox"> 
-        <label for="shortenUrlCheckbox">l.wl.co</label>
-    </div>
-
-    <div id="progressBar">
+      <div id="progressBar">
         <div id="progress"></div>
+      </div>
+
+      <div id="workerUrl" class="hidden"></div>
+      <div class="form-group" style="margin-top: 25px">
+        <label for="deployedUrls">URL Worker yang Dideploy:</label>
+        <textarea
+          id="deployedUrls"
+          rows="8"
+          readonly
+          placeholder="URL worker yang berhasil dideploy akan muncul di sini..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="response">Log Respon API:</label>
+        <textarea
+          id="response"
+          rows="4"
+          readonly
+          placeholder="Respon dari API akan ditampilkan di sini..."
+        ></textarea>
+      </div>
     </div>
-    <div id="workerUrl"></div>
 
-    <label for="deployedUrls">Deployed Worker URLs:</label>
-    <textarea id="deployedUrls" rows="10"></textarea>
-    
-    <label for="response">Response:</label>
-    <textarea id="response" rows="3" readonly></textarea>
+    <div id="toast" class="toast"></div>
 
-</div>
+    <div class="footer">
+      Made with ❤️ by
+      <a href="https://Sleepers.com/">Sleepers</a>
+    </div>
 
-<!-- Toast Notification -->
-<div id="toast" class="toast">Worker berhasil dibuat!</div>
-
-<script>
-    function generateWorkerName() {
-        const names = ["Adelheid", "Agnes", "Aileen", "Albertina", "Albertine", "Aleksandra", "Alexa", "Alexandra", "Alice", "Alina", "Alma", "Aloisia", "Aloysia", "Amalia", "Amalie", "Amanda", "Amelia", "Amelie", "Amilia", "Amilie", "Andrea", "Anett", "Anette", "Angela", "Angelica", "Angelika", "Ania", "Anita", "Anja", "Anke", "Anna", "Annabell", "Anne", "Annegret", "Annegreth", "Anneliese", "Annelise", "Annelore", "Annemarie", "Annett", "Annette", "Anni", "Annica", "Annie", "Annika", "Annja", "Anny", "Antje", "Antonia", "Anya", "Ariane", "Astrid", "Auguste", "Ava", "Awa", "Ayleen", "Aylin", "Barbara", "Barbel", "Bea", "Beata", "Beate", "Beatha", "Beathe", "Beatrice", "Beatrix", "Berta", "Bertha", "Betina", "Bettina", "Bianca", "Bianka", "Birgit", "Birgith", "Birgitt", "Birte", "Birthe", "Brigitta", "Brigitte", "Britt", "Britta", "Brunhilde", "Cacilia", "Cacilie", "Caecilia", "Caecilie", "Caren", "Carin", "Carina", "Carla", "Carlotta", "Carmen", "Carola", "Carolin", "Carolina", "Caroline", "Catarina", "Catharina", "Cathi", "Cathrin", "Cathy", "Cati", "Catrin", "Caty", "Cecilia", "Cecilie", "Celin", "Celina", "Celine", "Cerstin", "Chantal", "Charlotte", "Chiara", "Christa", "Christel", "Christiane", "Christin", "Christina", "Christine", "Christl", "Ciara", "Clara", "Claudia", "Constanze", "Cora", "Corinna", "Cornelia", "Cristina", "Cristine", "Dagmar", "Dana", "Daniela", "Denise", "Diana", "Diane", "Dietlind", "Dietlinde", "Doerthe", "Dora", "Doreen", "Doris", "Dorit", "Dorith", "Dorotea", "Dorothea", "Dorte", "Dorthe", "Eda", "Edda", "Edit", "Edith", "Eike", "Eileen", "Elena", "Eleonora", "Eleonore", "Elfriede", "Elina", "Elisa", "Elisabet", "Elisabeth", "Elise", "Elke", "Ella", "Eloise", "Elsa", "Else", "Emely", "Emilia", "Emilie", "Emily", "Emma", "Enna", "Erica", "Erika", "Erna", "Ester", "Esther", "Eugenie", "Eva", "Fenja", "Finja", "Finnja", "Fiona", "Franca", "Francka", "Franka", "Franzisca", "Franziska", "Frauke", "Frida", "Friderike", "Frieda", "Friederike", "Fritzi", "Frizzi", "Gabi", "Gabriele", "Gaby", "Gerda", "Gerdeke", "Gerharda", "Gerhardina", "Gertrud", "Gertrude", "Gesa", "Gesine", "Giesela", "Gisela", "Greta", "Gretchen", "Grete", "Gretel", "Gretha", "Grethe", "Gretl", "Gudrun", "Gunda", "Gundula", "Haike", "Hanna", "Hannah", "Hanne", "Hannelore", "Hedda", "Hedi", "Hedwig", "Hedy", "Heidelinde", "Heidi", "Heike", "Helena", "Helene", "Helga", "Henni", "Hennie", "Henny", "Henriette", "Hermine", "Herta", "Hertha", "Hildegard", "Ida", "Ilka", "Ilona", "Ilse", "Imke", "Inga", "Inge", "Ingeborg", "Ingelore", "Ingrid", "Inken", "Irene", "Iris", "Irma", "Irmgard", "Isabel", "Isabell", "Isabelle", "Ivonn", "Ivonne", "Jacqueline", "Jana", "Jane", "Janina", "Jasmin", "Jeanette", "Jeannette", "Jennifer", "Jessica", "Jessika", "Jette", "Johanna", "Jolina", "Josefine", "Josephine", "Judit", "Judith", "Jule", "Julia", "Juliane", "Jutta", "Kaete", "Kaethe", "Kai", "Karen", "Karin", "Karina", "Karla", "Karola", "Karolin", "Karolina", "Karoline", "Katarina", "Kate", "Katharina", "Kathe", "Kathi", "Kathrin", "Kathy", "Kati", "Katia", "Katja", "Katrin", "Katy", "Kay", "Kerstin", "Kiara", "Kim", "Kira", "Kirsten", "Klara", "Klaudia", "Konstanze", "Kora", "Korinna", "Kornelia", "Krista", "Kristiane", "Kristin", "Kristina", "Kristine", "Kunigunde", "Lara", "Larissa", "Laura", "Lea", "Leah", "Lena", "Lene", "Leni", "Leoni", "Leonie", "Leonore", "Leony", "Lia", "Liane", "Liesa", "Lieschen", "Liesel", "Lieselotte", "Liesl", "Lili", "Lilie", "Lilli", "Lillie", "Lilly", "Lily", "Lina", "Linda", "Linn", "Lisa", "Lisann", "Lisanne", "Lischen", "Lisel", "Lisl", "Lora", "Lore", "Loreley", "Lotta", "Lotte", "Lotti", "Lottie", "Lotty", "Louisa", "Louise", "Luci", "Lucie", "Lucy", "Luisa", "Luise", "Luna", "Lydia", "Lynda", "Lynn", "Magda", "Magdalena", "Magdalene", "Maike", "Maja", "Mandy", "Manuela", "Mara", "Mareike", "Maren", "Margareta", "Margarete", "Margaretha", "Margarethe", "Margarita", "Margaritha", "Margit", "Margot", "Margret", "Maria", "Marianne", "Marie", "Marina", "Marion", "Marlene", "Marlies", "Marlis", "Marta", "Martha", "Martina", "Mathilda", "Mathilde", "Matilda", "Matilde", "Mechthild", "Mechthilde", "Mechtild", "Mechtilde", "Meike", "Melanie", "Melina", "Melissa", "Merle", "Meta", "Mia", "Michaela", "Milla", "Minna", "Mira", "Miriam", "Mirjam", "Mona", "Moni", "Monica", "Monika", "Myriam", "Nadia", "Nadin", "Nadine", "Nadja", "Nadya", "Natalie", "Nathalie", "Neele", "Nehle", "Nele", "Nicola", "Nicole", "Nikola", "Nina", "Nine", "Nora", "Notburg", "Oda", "Olga", "Olivia", "Ortrud", "Ortrun", "Pamela", "Patricia", "Patrizia", "Paula", "Paulina", "Pauline", "Petra", "Pia", "Rafaela", "Ramona", "Raphaela", "Rebecca", "Rebecka", "Rebekka", "Regina", "Regine", "Reinhild", "Renate", "Rieke", "Rike", "Rita", "Romy", "Ronia", "Ronja", "Ronya", "Rosa", "Rosamunde", "Rose", "Rosemarie", "Rosi", "Rosie", "Rosy", "Rut", "Ruth", "Sabine", "Sabrina", "Sahra", "Samira", "Sandra", "Sara", "Sarah", "Saskia", "Selin", "Selina", "Seline", "Sibille", "Sibylle", "Siegrid", "Siegried", "Siegrun", "Sigrid", "Sigried", "Sigrun", "Silke", "Silvia", "Simone", "Sina", "Sofi", "Sofia", "Sofie", "Solveig", "Sonia", "Sonja", "Sonya", "Sophia", "Sophie", "Stefanie", "Steffi", "Steffie", "Stella", "Stephanie", "Stephi", "Stephie", "Susan", "Susann", "Susanne", "Susi", "Susie", "Susy", "Svaantje", "Svantje", "Svea", "Svenja", "Swaantje", "Swantje", "Swenja", "Sybille", "Sybylle", "Sylke", "Sylvia", "Tamara", "Tania", "Tanja", "Tanya", "Tatiana", "Tatjana", "Tatyana", "Tea", "Tekla", "Teodora", "Teresa", "Terese", "Teresia", "Thea", "Thekla", "Theodora", "Theresa", "Therese", "Theresia", "Thilda", "Thilde", "Thyra", "Tilda", "Tilde", "Tina", "Toni", "Tony", "Traute", "Tyra", "Ulla", "Ulrike", "Ursula", "Uschi", "Uta", "Ute", "Valentina", "Vanessa", "Vera", "Verena", "Veronica", "Veronika", "Victoria", "Viktoria", "Vivien", "Waltraud", "Waltraut", "Wanda", "Wera", "Wibke", "Wiebke", "Wilhelmina", "Wilhelmine", "Wilma", "Wolfgund", "Wolfgunde", "Wolfhild", "Wolfhilde", "Wolfrun", "Yasmin", "Yvonn", "Yvonne"];
+    <script>
+      // Utility function to generate a random worker name
+      function generateWorkerName() {
+        const names = [
+          "Adelheid",
+          "Agnes",
+          "Aileen",
+          "Albertina",
+          "Albertine",
+          "Aleksandra",
+          "Alexa",
+          "Alexandra",
+          "Alice",
+          "Alina",
+          "Alma",
+          "Aloisia",
+          "Aloysia",
+          "Amalia",
+          "Amalie",
+          "Amanda",
+          "Amelia",
+          "Amelie",
+          "Amilia",
+          "Amilie",
+          "Andrea",
+          "Anett",
+          "Anette",
+          "Angela",
+          "Angelica",
+          "Angelika",
+          "Ania",
+          "Anita",
+          "Anja",
+          "Anke",
+          "Anna",
+          "Annabell",
+          "Anne",
+          "Annegret",
+          "Annegreth",
+          "Anneliese",
+          "Annelise",
+          "Annelore",
+          "Annemarie",
+          "Annett",
+          "Annette",
+          "Anni",
+          "Annica",
+          "Annie",
+          "Annika",
+          "Annja",
+          "Anny",
+          "Antje",
+          "Antonia",
+          "Anya",
+          "Ariane",
+          "Astrid",
+          "Auguste",
+          "Ava",
+          "Awa",
+          "Ayleen",
+          "Aylin",
+          "Barbara",
+          "Barbel",
+          "Bea",
+          "Beata",
+          "Beate",
+          "Beatha",
+          "Beathe",
+          "Beatrice",
+          "Beatrix",
+          "Berta",
+          "Bertha",
+          "Betina",
+          "Bettina",
+          "Bianca",
+          "Bianka",
+          "Birgit",
+          "Birgith",
+          "Birgitt",
+          "Birte",
+          "Birthe",
+          "Brigitta",
+          "Brigitte",
+          "Britt",
+          "Britta",
+          "Brunhilde",
+          "Cacilia",
+          "Cacilie",
+          "Caecilia",
+          "Caecilie",
+          "Caren",
+          "Carin",
+          "Carina",
+          "Carla",
+          "Carlotta",
+          "Carmen",
+          "Carola",
+          "Carolin",
+          "Carolina",
+          "Caroline",
+          "Catarina",
+          "Catharina",
+          "Cathi",
+          "Cathrin",
+          "Cathy",
+          "Cati",
+          "Catrin",
+          "Caty",
+          "Cecilia",
+          "Cecilie",
+          "Celin",
+          "Celina",
+          "Celine",
+          "Cerstin",
+          "Chantal",
+          "Charlotte",
+          "Chiara",
+          "Christa",
+          "Christel",
+          "Christiane",
+          "Christin",
+          "Christina",
+          "Christine",
+          "Christl",
+          "Ciara",
+          "Clara",
+          "Claudia",
+          "Constanze",
+          "Cora",
+          "Corinna",
+          "Cornelia",
+          "Cristina",
+          "Cristine",
+          "Dagmar",
+          "Dana",
+          "Daniela",
+          "Denise",
+          "Diana",
+          "Diane",
+          "Dietlind",
+          "Dietlinde",
+          "Doerthe",
+          "Dora",
+          "Doreen",
+          "Doris",
+          "Dorit",
+          "Dorith",
+          "Dorotea",
+          "Dorothea",
+          "Dorte",
+          "Dorthe",
+          "Eda",
+          "Edda",
+          "Edit",
+          "Edith",
+          "Eike",
+          "Eileen",
+          "Elena",
+          "Eleonora",
+          "Eleonore",
+          "Elfriede",
+          "Elina",
+          "Elisa",
+          "Elisabet",
+          "Elisabeth",
+          "Elise",
+          "Elke",
+          "Ella",
+          "Eloise",
+          "Elsa",
+          "Else",
+          "Emely",
+          "Emilia",
+          "Emilie",
+          "Emily",
+          "Emma",
+          "Enna",
+          "Erica",
+          "Erika",
+          "Erna",
+          "Ester",
+          "Esther",
+          "Eugenie",
+          "Eva",
+          "Fenja",
+          "Finja",
+          "Finnja",
+          "Fiona",
+          "Franca",
+          "Francka",
+          "Franka",
+          "Franzisca",
+          "Franziska",
+          "Frauke",
+          "Frida",
+          "Friderike",
+          "Frieda",
+          "Friederike",
+          "Fritzi",
+          "Frizzi",
+          "Gabi",
+          "Gabriele",
+          "Gaby",
+          "Gerda",
+          "Gerdeke",
+          "Gerharda",
+          "Gerhardina",
+          "Gertrud",
+          "Gertrude",
+          "Gesa",
+          "Gesine",
+          "Giesela",
+          "Gisela",
+          "Greta",
+          "Gretchen",
+          "Grete",
+          "Gretel",
+          "Gretha",
+          "Grethe",
+          "Gretl",
+          "Gudrun",
+          "Gunda",
+          "Gundula",
+          "Haike",
+          "Hanna",
+          "Hannah",
+          "Hanne",
+          "Hannelore",
+          "Hedda",
+          "Hedi",
+          "Hedwig",
+          "Hedy",
+          "Heidelinde",
+          "Heidi",
+          "Heike",
+          "Helena",
+          "Helene",
+          "Helga",
+          "Henni",
+          "Hennie",
+          "Henny",
+          "Henriette",
+          "Hermine",
+          "Herta",
+          "Hertha",
+          "Hildegard",
+          "Ida",
+          "Ilka",
+          "Ilona",
+          "Ilse",
+          "Imke",
+          "Inga",
+          "Inge",
+          "Ingeborg",
+          "Ingelore",
+          "Ingrid",
+          "Inken",
+          "Irene",
+          "Iris",
+          "Irma",
+          "Irmgard",
+          "Isabel",
+          "Isabell",
+          "Isabelle",
+          "Ivonn",
+          "Ivonne",
+          "Jacqueline",
+          "Jana",
+          "Jane",
+          "Janina",
+          "Jasmin",
+          "Jeanette",
+          "Jeannette",
+          "Jennifer",
+          "Jessica",
+          "Jessika",
+          "Jette",
+          "Johanna",
+          "Jolina",
+          "Josefine",
+          "Josephine",
+          "Judit",
+          "Judith",
+          "Jule",
+          "Julia",
+          "Juliane",
+          "Jutta",
+          "Kaete",
+          "Kaethe",
+          "Kai",
+          "Karen",
+          "Karin",
+          "Karina",
+          "Karla",
+          "Karola",
+          "Karolin",
+          "Karolina",
+          "Karoline",
+          "Katarina",
+          "Kate",
+          "Katharina",
+          "Kathe",
+          "Kathi",
+          "Kathrin",
+          "Kathy",
+          "Kati",
+          "Katia",
+          "Katja",
+          "Katrin",
+          "Katy",
+          "Kay",
+          "Kerstin",
+          "Kiara",
+          "Kim",
+          "Kira",
+          "Kirsten",
+          "Klara",
+          "Klaudia",
+          "Konstanze",
+          "Kora",
+          "Korinna",
+          "Kornelia",
+          "Krista",
+          "Kristiane",
+          "Kristin",
+          "Kristina",
+          "Kristine",
+          "Kunigunde",
+          "Lara",
+          "Larissa",
+          "Laura",
+          "Lea",
+          "Leah",
+          "Lena",
+          "Lene",
+          "Leni",
+          "Leoni",
+          "Leonie",
+          "Leonore",
+          "Leony",
+          "Lia",
+          "Liane",
+          "Liesa",
+          "Lieschen",
+          "Liesel",
+          "Lieselotte",
+          "Liesl",
+          "Lili",
+          "Lilie",
+          "Lilli",
+          "Lillie",
+          "Lilly",
+          "Lily",
+          "Lina",
+          "Linda",
+          "Linn",
+          "Lisa",
+          "Lisann",
+          "Lisanne",
+          "Lischen",
+          "Lisel",
+          "Lisl",
+          "Lora",
+          "Lore",
+          "Loreley",
+          "Lotta",
+          "Lotte",
+          "Lotti",
+          "Lottie",
+          "Lotty",
+          "Louisa",
+          "Louise",
+          "Luci",
+          "Lucie",
+          "Lucy",
+          "Luisa",
+          "Luise",
+          "Luna",
+          "Lydia",
+          "Lynda",
+          "Lynn",
+          "Magda",
+          "Magdalena",
+          "Magdalene",
+          "Maike",
+          "Maja",
+          "Mandy",
+          "Manuela",
+          "Mara",
+          "Mareike",
+          "Maren",
+          "Margareta",
+          "Margarete",
+          "Margaretha",
+          "Margarethe",
+          "Margarita",
+          "Margaritha",
+          "Margit",
+          "Margot",
+          "Margret",
+          "Maria",
+          "Marianne",
+          "Marie",
+          "Marina",
+          "Marion",
+          "Marlene",
+          "Marlies",
+          "Marlis",
+          "Marta",
+          "Martha",
+          "Martina",
+          "Mathilda",
+          "Mathilde",
+          "Matilda",
+          "Matilde",
+          "Mechthild",
+          "Mechthilde",
+          "Mechtild",
+          "Mechtilde",
+          "Meike",
+          "Melanie",
+          "Melina",
+          "Melissa",
+          "Merle",
+          "Meta",
+          "Mia",
+          "Michaela",
+          "Milla",
+          "Minna",
+          "Mira",
+          "Miriam",
+          "Mirjam",
+          "Mona",
+          "Moni",
+          "Monica",
+          "Monika",
+          "Myriam",
+          "Nadia",
+          "Nadin",
+          "Nadine",
+          "Nadja",
+          "Nadya",
+          "Natalie",
+          "Nathalie",
+          "Neele",
+          "Nehle",
+          "Nele",
+          "Nicola",
+          "Nicole",
+          "Nikola",
+          "Nina",
+          "Nine",
+          "Nora",
+          "Notburg",
+          "Oda",
+          "Olga",
+          "Olivia",
+          "Ortrud",
+          "Ortrun",
+          "Pamela",
+          "Patricia",
+          "Patrizia",
+          "Paula",
+          "Paulina",
+          "Pauline",
+          "Petra",
+          "Pia",
+          "Rafaela",
+          "Ramona",
+          "Raphaela",
+          "Rebecca",
+          "Rebecka",
+          "Rebekka",
+          "Regina",
+          "Regine",
+          "Reinhild",
+          "Renate",
+          "Rieke",
+          "Rike",
+          "Rita",
+          "Romy",
+          "Ronia",
+          "Ronja",
+          "Ronya",
+          "Rosa",
+          "Rosamunde",
+          "Rose",
+          "Rosemarie",
+          "Rosi",
+          "Rosie",
+          "Rosy",
+          "Rut",
+          "Ruth",
+          "Sabine",
+          "Sabrina",
+          "Sahra",
+          "Samira",
+          "Sandra",
+          "Sara",
+          "Sarah",
+          "Saskia",
+          "Selin",
+          "Selina",
+          "Seline",
+          "Sibille",
+          "Sibylle",
+          "Siegrid",
+          "Siegried",
+          "Siegrun",
+          "Sigrid",
+          "Sigried",
+          "Sigrun",
+          "Silke",
+          "Silvia",
+          "Simone",
+          "Sina",
+          "Sofi",
+          "Sofia",
+          "Sofie",
+          "Solveig",
+          "Sonia",
+          "Sonja",
+          "Sonya",
+          "Sophia",
+          "Sophie",
+          "Stefanie",
+          "Steffi",
+          "Steffie",
+          "Stella",
+          "Stephanie",
+          "Stephi",
+          "Stephie",
+          "Susan",
+          "Susann",
+          "Susanne",
+          "Susi",
+          "Susie",
+          "Susy",
+          "Svaantje",
+          "Svantje",
+          "Svea",
+          "Svenja",
+          "Swaantje",
+          "Swantje",
+          "Swenja",
+          "Sybille",
+          "Sybylle",
+          "Sylke",
+          "Sylvia",
+          "Tamara",
+          "Tania",
+          "Tanja",
+          "Tanya",
+          "Tatiana",
+          "Tatjana",
+          "Tatyana",
+          "Tea",
+          "Tekla",
+          "Teodora",
+          "Teresa",
+          "Terese",
+          "Teresia",
+          "Thea",
+          "Thekla",
+          "Theodora",
+          "Theresa",
+          "Therese",
+          "Theresia",
+          "Thilda",
+          "Thilde",
+          "Thyra",
+          "Tilda",
+          "Tilde",
+          "Tina",
+          "Toni",
+          "Tony",
+          "Traute",
+          "Tyra",
+          "Ulla",
+          "Ulrike",
+          "Ursula",
+          "Uschi",
+          "Uta",
+          "Ute",
+          "Valentina",
+          "Vanessa",
+          "Vera",
+          "Verena",
+          "Veronica",
+          "Veronika",
+          "Victoria",
+          "Viktoria",
+          "Vivien",
+          "Waltraud",
+          "Waltraut",
+          "Wanda",
+          "Wera",
+          "Wibke",
+          "Wiebke",
+          "Wilhelmina",
+          "Wilhelmine",
+          "Wilma",
+          "Wolfgund",
+          "Wolfgunde",
+          "Wolfhild",
+          "Wolfhilde",
+          "Wolfrun",
+          "Yasmin",
+          "Yvonn",
+          "Yvonne",
+        ];
         const randomName = names[Math.floor(Math.random() * names.length)];
         const timestamp = Date.now().toString(); // Mengubah timestamp menjadi string
         const lastSevenDigits = timestamp.slice(-7); // Mengambil 7 angka terakhir
         return `${randomName.toLowerCase()}${lastSevenDigits}`;
-    }
+      }
 
-    async function deployWorker() {
-        const deployCount = parseInt(document.getElementById("deployCount").value) || 1;
-        const workerTextarea = document.getElementById("workerCode");
-        let workerCode = workerTextarea.value.trim();
+      // Function to deploy the worker
+      async function deployWorker() {
+        const deployButton = document.getElementById("deployButton");
+        deployButton.disabled = true; // Disable button during deployment
+        deployButton.textContent = "Sedang Deploy...";
+        document.getElementById("progress").style.width = "0%"; // Reset progress bar
+
+        const deployCount =
+          parseInt(document.getElementById("deployCount").value) || 1;
+        let workerCode = document.getElementById("workerCode").value.trim();
         const responseTextarea = document.getElementById("response");
-        const workerUrlDiv = document.getElementById("workerUrl");
         const deployedUrlsTextarea = document.getElementById("deployedUrls");
-        const shortenUrlCheckbox = document.getElementById("shortenUrlCheckbox").checked;
+        const shortenUrlCheckbox =
+          document.getElementById("shortenUrlCheckbox").checked;
 
-        // Ambil input dari user
+        // Get user inputs
         const accountId = document.getElementById("accountId").value.trim();
         const apiToken = document.getElementById("apiToken").value.trim();
         const workerTitle = document.getElementById("workerTitle").value.trim();
+        const workerDescription = document
+          .getElementById("workerDescription")
+          .value.trim(); // Added
         const redirectUrl = document.getElementById("redirectUrl").value.trim();
         const imageUrl = document.getElementById("imageUrl").value.trim();
 
-        if (!workerCode || !accountId || !apiToken) {
-            responseTextarea.value = "Pastikan semua kolom sudah diisi!";
-            return;
+        // Basic validation
+        if (
+          !accountId ||
+          !apiToken ||
+          !workerTitle ||
+          !redirectUrl ||
+          !imageUrl
+        ) {
+          responseTextarea.value =
+            "Error: Semua kolom wajib (kecuali Deskripsi) harus diisi!";
+          showToast("Gagal: Lengkapi semua input!");
+          deployButton.disabled = false;
+          deployButton.textContent = "Deploy Worker";
+          return;
         }
 
-        // **Update workerCode sesuai input pengguna**
+        // Update workerCode dynamically with user inputs
         workerCode = workerCode
-            .replace(/<title>.*?<\/title>/, `<title>${workerTitle}</title>`)
-            .replace(/location\.replace\(['"].*?['"]\);/, `location.replace('${redirectUrl}');`)
-            .replace(/<meta property="og:image.*?>/g, `<meta property="og:image" content="${imageUrl}" />`);
+          .replace(/<title>.*?<\/title>/, `<title>${workerTitle}</title>`)
+          .replace(
+            /location\.replace\(['"].*?['"]\);/,
+            `location.replace('${redirectUrl}');`
+          )
+          .replace(
+            /<meta property="og:image".*?content=".*?".*?\/>/g,
+            `<meta property="og:image" content="${imageUrl}" />`
+          );
 
-        // Tampilkan perubahan di textarea
-        workerTextarea.value = workerCode;
+        // You might want to update the hidden textarea if you want to see the generated code
+        // document.getElementById("workerCode").value = workerCode;
 
-        // API Worker Generator
         const apiUrl = `https://workerq.kentudiair89.workers.dev/?accountId=${accountId}&apiToken=${apiToken}`;
+        deployedUrlsTextarea.value = ""; // Clear previous URLs
 
         for (let i = 0; i < deployCount; i++) {
-            const workerName = generateWorkerName();
-            try {
-                const response = await fetch(`${apiUrl}&workerName=${workerName}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/javascript" },
-                    body: workerCode
-                });
+          const workerName = generateWorkerName();
+          try {
+            const response = await fetch(`${apiUrl}&workerName=${workerName}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/javascript" },
+              body: workerCode,
+            });
 
-                const result = await response.json();
-                console.log(result)
+            const result = await response.json();
+            console.log(result); // For debugging
 
-                if (result.success && result.url) {
-                    let workerUrl = `${result.url}`;
-                    if (shortenUrlCheckbox) {
-                        workerUrl = `https://l.wl.co/l?u=${workerUrl}`;
-                    }
-                    deployedUrlsTextarea.value += `${workerUrl}\n`;
-                } else {
-                    responseTextarea.value = `Error: Worker berhasil di-deploy, tetapi subdomain tidak ditemukan!\n\nResponse:\n${JSON.stringify(result, null, 2)}`;
-                }
-
-                responseTextarea.value = `Worker berhasil dibuat!\n\nResponse:\n${JSON.stringify(result, null, 2)}`;
-                showToast();
-            } catch (error) {
-                responseTextarea.value = `Error: ${error.message}`;
+            if (result.success && result.url) {
+              let workerUrl = `${result.url}`;
+              if (shortenUrlCheckbox) {
+                workerUrl = `https://l.wl.co/l?u=${encodeURIComponent(
+                  workerUrl
+                )}`;
+              }
+              deployedUrlsTextarea.value += `${workerUrl}\n`;
+              responseTextarea.value = `Deploy ${
+                i + 1
+              }/${deployCount} berhasil untuk worker: ${workerName}\n`;
+              responseTextarea.value += `URL: ${workerUrl}\n`;
+              responseTextarea.value += `Respons API: ${JSON.stringify(
+                result.messages || result,
+                null,
+                2
+              )}\n\n`; // Show more specific message
+              showToast(`Worker ${workerName} berhasil dideploy!`);
+            } else {
+              responseTextarea.value += `Error deploy worker ${workerName}:\n`;
+              responseTextarea.value += `Respons API: ${JSON.stringify(
+                result,
+                null,
+                2
+              )}\n\n`;
+              showToast(`Gagal deploy worker ${workerName}!`);
+              // Optionally break if one deploy fails
+              // break;
             }
+          } catch (error) {
+            responseTextarea.value += `Kesalahan koneksi/API untuk worker ${workerName}: ${error.message}\n\n`;
+            showToast("Terjadi kesalahan koneksi!");
+            // Optionally break if network error occurs
+            // break;
+          }
 
-            // Update progress bar
-            const progress = ((i + 1) / deployCount) * 100;
-            document.getElementById("progress").style.width = `${progress}%`;
+          // Update progress bar
+          const progress = ((i + 1) / deployCount) * 100;
+          document.getElementById("progress").style.width = `${progress}%`;
         }
-    }
 
-    function showToast() {
+        deployButton.disabled = false;
+        deployButton.textContent = "Deploy Worker";
+        showToast("Proses deploy selesai!");
+      }
+
+      // Function to show toast notification
+      function showToast(message) {
         const toast = document.getElementById("toast");
+        toast.textContent = message;
         toast.style.display = "block";
+        // Reset animation for re-triggering
+        toast.style.animation = "none";
+        void toast.offsetWidth; // Trigger reflow
+        toast.style.animation = null;
 
         setTimeout(() => {
-            toast.style.display = "none";
-        }, 3000);
-    }
+          toast.style.display = "none";
+        }, 3000); // Hide after 3 seconds
+      }
 
-    // Menambahkan event listener untuk tombol deploy
-    document.getElementById("deployButton").addEventListener("click", deployWorker);
-</script>
-
-</body>
+      // Event listener for the deploy button
+      document
+        .getElementById("deployButton")
+        .addEventListener("click", deployWorker);
+    </script>
+  </body>
 </html>
