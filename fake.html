@@ -109,9 +109,12 @@
         const firstName = faker.name.firstName('female');
         const lastName = faker.name.lastName();
         const randomNumber = Math.floor(Math.random() * 1000); // Generate random number up to 999
+        const u = `${firstName}_${lastName}${randomNumber}`;
+        const username = u.toLowerCase();
+        
 
         document.getElementById('fakeName').value = `${firstName} ${lastName}`;
-        document.getElementById('username').value = `${firstName}_${lastName}${randomNumber}`;
+        document.getElementById('username').value = '${username}';
         document.getElementById('email').value = `${firstName}_${lastName}${randomNumber}@xonemail.xyz`;
     }
 
