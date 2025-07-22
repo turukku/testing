@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>💋 Caption Facebook</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://static.xx.fbcdn.net/rsrc.php/y1/r/ay1hV6OlegS.ico"
+      type="image/x-icon"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Playfair Display", serif;
+        background-color: #e9ebee;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 15px;
+      }
+
+      .container {
+        background: white;
+        max-width: 480px;
+        width: 100%;
+        padding: 30px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 24px;
+        color: #1877f2;
+        margin-bottom: 20px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 140px;
+        padding: 15px;
+        font-size: 15px;
+        font-family: "Playfair Display", serif;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        resize: none;
+        margin-bottom: 15px;
+        background: #f5f6f7;
+        color: #333;
+      }
+
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+
+      button {
+        flex: 1 1 45%;
+        padding: 12px 16px;
+        font-size: 15px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        color: white;
+        transition: background 0.3s ease;
+      }
+
+      #generateBtn {
+        background-color: #1877f2;
+      }
+
+      #generateBtn:hover {
+        background-color: #155cc0;
+      }
+
+      #copyBtn {
+        background-color: #42b72a;
+      }
+
+      #copyBtn:hover {
+        background-color: #36a420;
+      }
+
+      #myLink {
+        min-height: 100px;
+      }
+
+      .toggle-container {
+        margin: 5px;
+        padding-bottom: 15px;
+        text-align: left;
+      }
+
+      .toggle-container label {
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .toggle-container input[type="checkbox"] {
+        transform: scale(1.3);
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 20px;
+        }
+
+        button {
+          font-size: 14px;
+        }
+      }
+      #toast {
+        visibility: hidden;
+        min-width: 250px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 12px;
+        position: fixed;
+        z-index: 1000;
+        bottom: 30px;
+        right: 30px;
+        font-size: 16px;
+        opacity: 0;
+        transition: opacity 0.5s, visibility 0.5s;
+      }
+
+      #toast.show {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="toast"
+      class="fixed bottom-6 right-6 z-50 hidden items-center bg-gray-800 text-white text-sm px-4 py-3 rounded shadow-lg transition-opacity duration-500"
+    >
+      Made With ❤️ By <strong class="ml-1">FoxTeam</strong> loaded!
+    </div>
+    <div class="container">
+      <h1>💬 Caption Generator</h1>
+      <textarea id="output" readonly>Enjoy</textarea>
+      <div class="toggle-container">
+        <label>
+          <input type="checkbox" id="messageToggle" />
+          Aktifkan untuk " Message caption "
+        </label>
+      </div>
+      <div class="buttons">
+        <button id="generateBtn">🔁 Generate Caption</button>
+        <button id="copyBtn">📋 Salin Caption</button>
+      </div>
+
+      <textarea
+        id="myLink"
+        placeholder="Masukkan daftar link, 1 per baris"
+      ></textarea>
+      <footer
+        style="
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          text-align: center;
+          padding: 10px;
+          font-size: 12px;
+          color: #000;
+        "
+      >
+        &copy; 2025 Made With ❤️ By <strong>@Kentood</strong>
+      </footer>
+    </div>
+
+    <script>
+      function showToast(message = "Script by FoxTeam loaded!") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "show";
+        setTimeout(() => {
+          toast.className = toast.className.replace("show", "");
+        }, 1000);
+      }
+
+      // Call toast after page load or some event
+      window.onload = () => showToast();
+
+      const captionsNormal = [
+        "I could be your favorite hello,\nAnd your naughtiest secret 💋\nLet’s begin → ",
+        "I don’t play hard to get.\nI play to be unforgettable 😈\nSlide in → ",
+        "Sweet lips, wild thoughts 😘\nWanna taste? → ",
+        "You keep watching, I keep teasing 😏\nCome closer → ",
+        "I’m not the one your mama warned you about…\nI’m worse 😈\nMessage me now → ",
+        "One click and I’ll be your new obsession 💦\nLet’s play → ",
+        "I’m the “yes” to all your naughty thoughts 😏\nTalk to me → ",
+        "Touch me with your words first 💬\nTalk dirty to me → ",
+        "I’m soft to look at, hard to resist 😘\nTry me → ",
+        "Come get a little trouble with your pleasure 😈\nTap here → ",
+        "You’ve seen enough... now feel it 💋\nClick here → ",
+        "All dressed up with bad 🔥\nLet’s misbehave → ",
+        "Caution: hot content inside 🔥\nHandle with care → ",
+        "I don’t need much—just your full attention 💋\nLet’s make it personal → ",
+        "I’m not your type.\nI’m your addiction 😈\nYou’ve been warned → ",
+        "Bet your imagination can’t keep up 😉\nLet me take over → ",
+        "You want it soft or rough?\nEither way, message me → ",
+        "A look from me = thoughts you’ll regret later 😘\nDon’t hold back → ",
+        "This heat won’t wait…\nSlide in now → ",
+        "Tonight, I’m your favorite sin 😈\nClaim me → ",
+        "Just a taste… and you’ll crave more 😘\nCome closer → ",
+        "This isn’t just flirting. It’s a warning 💋\nMessage me → ",
+        "I tease. You melt 😏\nTry me → ",
+        "Stop staring. Start tapping 😈\nLet’s talk → ",
+        "Let your fingers do the flirting 💦\nSend that DM → ",
+        "Catch me before I disappear 😘\nTap now → ",
+        "Not for the faint-hearted 💋\nLet’s go wild → ",
+        "Soft voice, dirty mind 😏\nCome explore → ",
+        "Don’t scroll past your fantasy 😈\nClick here → ",
+        "Looking is allowed… touching starts with a message 😘\nSlide in → ",
+        "Some secrets are worth sharing 💋\nLet me be yours → ",
+        "Feisty, flirty, and fully available tonight 😈\nLet’s misbehave → ",
+        "Naughty but sweet enough to bring home 😘\nCome find out → ",
+        "I don’t bite… unless you ask nicely 😏\nMessage me → ",
+        "This body was made for your fantasies 💋\nLet’s begin → ",
+        "Your guilty pleasure is only one message away 😈\nDon’t be shy → ",
+        "You’ve scrolled this far. Must be fate 😉\nLet’s talk → ",
+        "Just enough bad girl to keep you curious 😘\nSlide into my world → ",
+        "Why dream when I’m just one click away? 😏\nMake a move → ",
+        "Let’s skip the small talk 💋\nStart now → ",
+        "My attitude? Naughty by default 😈\nTempt me → ",
+        "This heat? It’s personal 🔥\nDM me → ",
+        "Tonight, let’s blur the lines 😉\nCome play → ",
+        "I flirt like it’s my job 😘\nHire me → ",
+        "One pic, one message… unlimited fun 💋\nTry it → ",
+        "I’m not here to be decent 😈\nLet’s get wicked → ",
+        "Your lips on mine? Just the beginning 😏\nStart with a message → ",
+        "Fantasy in the flesh 😘\nClaim me now → ",
+        "You found me… now dare to talk 💋\nLet’s go → ",
+        "This tease comes with a happy ending 😈\nTap in → ",
+      ];
+
+      const captionsMessage = [
+        "Hey you… yes, you 😘 I’ve got something hot waiting — click and let’s get naughty 🔞👉 ",
+        "Lonely tonight? I’m not… but I could use some *fun* 😈 Click and send me something private 💋👉 ",
+        "Wanna know what a sexy girl like me does after dark? 💄 Find out here 👉 ",
+        "Don’t just stare, babe 👀 I left you a little something — click if you can handle it 🔥👉 ",
+        "I’m not wearing anything… but my smile 😏 Wanna see more? Click me 👉 ",
+        "Let’s skip the small talk and get to the fun part 😈💋 You know where to click 👉 ",
+        "Only for the bold ones 💦 My private contact is waiting — dare to tap it 👉 ",
+        "I’ve been naughty… wanna punish me? 😜 Slide into my private zone 👉 ",
+        "I have a secret… but I only share it in private 💋 Click and let’s talk 👉 ",
+        "I'm feeling a little wild tonight 🐾 Wanna join me? Click me 👉 ",
+        "This isn’t just a link… it’s your ticket to something *deliciously* private 😘👉 ",
+        "I bet you’ve never chatted with a woman like me 😈 Let’s change that 👉 ",
+        "Don’t make me beg... or do 😏 My contact’s waiting 👉 ",
+        "I’m the kind of trouble you’ll love 😇 Click and see why 👉 ",
+        "Let’s misbehave… but privately 😘🔞 Contact me here 👉 ",
+        "Feeling curious? Naughty? Both? 😈 Come play 👉 ",
+        "Touch me… with your message 💌 I’m just one click away 👉 ",
+        "Flirting is fun, but private chats are better 😏 Let’s start here 👉 ",
+        "Your guilty pleasure is just a tap away 🔥 Click now 👉 ",
+        "One message from you could make my night… or yours 😘 Let’s find out 👉 ",
+        "Tempted? You should be 😈 I don’t bite… unless you want me to 👉 ",
+        "A sexy secret is waiting behind this link 💋 Wanna peek? 👉 ",
+        "I know you’ve been thinking about me 👀 Don’t be shy… click 👉 ",
+        "Private. Naughty. Just for you 💦 Ready to chat? 👉 ",
+        "Let’s keep this between us 😘 My contact is ready for you 👉 ",
+        "If you’re looking for sweet… and spicy 🌶️ You’ve found her 👉 ",
+        "Click if you're into curvy, confident, and a little crazy 😉👉 ",
+        "I love attention… especially yours 😍 Give it to me here 👉 ",
+        "Bored? Lonely? Let me fix that 🔥 Let’s talk 👉 ",
+        "This isn’t just a link… it’s an invitation to play 😈👉 ",
+        "If your heart’s racing, don’t worry… mine is too 😘 Let’s connect 👉 ",
+        "Dare to go private with a sexy stranger? 💋 You know what to do 👉 ",
+        "Who needs a dating app when I’m right here? 😏 Click to connect 👉 ",
+        "I’ve been waiting for someone like you… ready to tease me? 👉 ",
+        "Some like it sweet. I like it naughty 😈 Let’s talk 👉 ",
+        "Your wildest chat yet is just one click away 🔥 Don’t resist 👉 ",
+        "I bet you can’t handle me… prove me wrong 😘👉 ",
+        "Sexy. Sultry. All yours — if you dare 👉 ",
+        "Slide into my world 💌 One click, and it's just us 👉 ",
+        "This link leads to pleasure... and maybe a little sin 😈👉 ",
+        "Wanna talk dirty… or sweet? I can do both 😘 Click here 👉 ",
+        "You came here for a reason… I hope it’s me 💋 Contact me 👉 ",
+        "Let me whisper something private… but first, click 👉 ",
+        "The real fun starts after the click 🔥 Don’t keep me waiting 👉 ",
+        "Naughty girls need company too 😇 Come chat 👉 ",
+        "Let's do something we’ll both remember 💋 Start here 👉 ",
+        "I’ve got a surprise waiting just for you 😈 Unwrap it 👉 ",
+        "Hot, honest, and just a little dangerous 😏 Click to connect 👉 ",
+        "Your fantasy? It starts with this click 😘👉 ",
+        "Don’t imagine me… message me 💌 Let’s get personal 👉 ",
+      ];
+
+      function genLink() {
+        const linkTextarea = document.getElementById("myLink");
+        const list = linkTextarea.value.trim().split("\n");
+
+        if (list.length === 0 || !list[0]) return "";
+
+        const item = list.shift();
+        linkTextarea.value = list.join("\n");
+        return item;
+      }
+
+      function generateCaption() {
+        const isMessageMode = document.getElementById("messageToggle").checked;
+        const captionList = isMessageMode ? captionsMessage : captionsNormal;
+
+        const randomIndex = Math.floor(Math.random() * captionList.length);
+        const caption = captionList[randomIndex];
+        const link = genLink();
+
+        if (!link) {
+          showToast("Link habis! Tambahkan lebih banyak link.");
+          //   return;
+        }
+
+        document.getElementById("output").value = caption + link;
+      }
+
+      function copyCaption() {
+        const textArea = document.getElementById("output");
+        if (!textArea.value || textArea.value.includes("Tekan")) {
+          alert("Belum ada caption untuk disalin!");
+          return;
+        }
+
+        textArea.select();
+        document.execCommand("copy");
+        showToast("Caption di salin");
+        textArea.style.backgroundColor = "#d4edda";
+        setTimeout(() => {
+          textArea.style.backgroundColor = "#f5f6f7";
+        }, 300);
+      }
+
+      document
+        .getElementById("generateBtn")
+        .addEventListener("click", generateCaption);
+      document.getElementById("copyBtn").addEventListener("click", copyCaption);
+    </script>
+  </body>
+</html>
