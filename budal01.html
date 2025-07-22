@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Akun, UID & Caption</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #007bff;
+        --primary-hover: #0056b3;
+        --secondary-bg: #e9ecef;
+        --text-color: #333;
+        --border-color: #ced4da;
+        --card-bg: #ffffff;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --border-radius: 8px; /* Lebih kecil */
+        --gap: 15px; /* Lebih kecil */
+        --success-color: #28a745;
+        --error-color: #dc3545;
+        --info-color: #17a2b8;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f4f7fa;
+        margin: 0;
+        padding: 20px 15px; /* Padding lebih kecil */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--gap);
+        color: var(--text-color);
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 550px; /* Max width lebih kecil */
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap);
+      }
+
+      .card {
+        background: var(--card-bg);
+        padding: 20px; /* Padding lebih kecil */
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        border: 1px solid #e0e0e0;
+        position: relative;
+      }
+
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 15px; /* Margin lebih kecil */
+        font-size: 1.3rem; /* Ukuran font lebih kecil */
+        color: var(--primary-color);
+        text-align: center;
+        font-weight: 600;
+      }
+
+      textarea,
+      input[type="number"],
+      input[type="text"],
+      input[readonly] {
+        width: 100%;
+        padding: 10px 12px; /* Padding lebih kecil */
+        margin: 8px 0; /* Margin lebih kecil */
+        border: 1px solid var(--border-color);
+        border-radius: 6px; /* Lebih kecil */
+        box-sizing: border-box;
+        font-size: 0.95rem; /* Ukuran font lebih kecil */
+        font-family: "Inter", sans-serif;
+        transition: all 0.2s ease-in-out;
+        background-color: var(--secondary-bg);
+      }
+
+      textarea:focus,
+      input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15); /* Shadow lebih kecil */
+        outline: none;
+        background-color: var(--card-bg);
+      }
+
+      input[readonly] {
+        background-color: var(--secondary-bg);
+        cursor: default;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 8px; /* Gap lebih kecil */
+        margin-bottom: 8px; /* Margin lebih kecil */
+      }
+
+      .input-group input {
+        margin: 0;
+      }
+
+      button {
+        padding: 10px 15px; /* Padding lebih kecil */
+        cursor: pointer;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 6px; /* Lebih kecil */
+        font-size: 0.9rem; /* Ukuran font lebih kecil */
+        font-weight: 500;
+        transition: background 0.2s ease-in-out, transform 0.1s ease;
+        flex-shrink: 0;
+      }
+
+      button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .button-group {
+        display: flex;
+        gap: 8px; /* Gap lebih kecil */
+        justify-content: flex-end;
+        margin-top: 12px; /* Margin lebih kecil */
+      }
+
+      .button-group.full-width {
+        justify-content: space-between;
+      }
+
+      .button-group button {
+        flex: 1;
+      }
+
+      .counter {
+        font-size: 0.85rem; /* Ukuran font lebih kecil */
+        text-align: right;
+        color: #6c757d;
+        margin-top: 8px; /* Margin lebih kecil */
+      }
+
+      /* Notifikasi */
+      .notification {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 8px; /* Padding lebih kecil */
+        text-align: center;
+        color: white;
+        font-size: 0.8rem; /* Ukuran font lebih kecil */
+        font-weight: 500;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+        z-index: 10;
+        box-sizing: border-box;
+      }
+      .notification.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .notification.success {
+        background-color: var(--success-color);
+      }
+      .notification.error {
+        background-color: var(--error-color);
+      }
+      .notification.info {
+        background-color: var(--info-color);
+      }
+
+      /* Toggle Switch CSS */
+      .toggle-container {
+        margin: 15px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .toggle-container label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        cursor: pointer;
+        color: var(--text-color);
+      }
+      .toggle-container input[type="checkbox"] {
+        position: relative;
+        appearance: none;
+        width: 38px; /* Lebih kecil */
+        height: 20px; /* Lebih kecil */
+        border-radius: 10px; /* Lebih kecil */
+        background-color: var(--border-color);
+        transition: background-color 0.2s;
+        cursor: pointer;
+        margin: 0; /* Override default margin */
+      }
+      .toggle-container input[type="checkbox"]::before {
+        content: "";
+        position: absolute;
+        width: 16px; /* Lebih kecil */
+        height: 16px; /* Lebih kecil */
+        border-radius: 50%;
+        background-color: white;
+        top: 2px;
+        left: 2px;
+        transition: transform 0.2s;
+      }
+      .toggle-container input[type="checkbox"]:checked {
+        background-color: var(--primary-color);
+      }
+      .toggle-container input[type="checkbox"]:checked::before {
+        transform: translateX(18px); /* Sesuaikan dengan ukuran baru */
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 580px) {
+        /* Sesuaikan breakpoint */
+        body {
+          padding: 15px 10px;
+        }
+        .card {
+          padding: 15px;
+        }
+        .card h2 {
+          font-size: 1.2rem;
+        }
+        button {
+          font-size: 0.85rem;
+          padding: 8px 12px;
+        }
+        .input-group {
+          flex-direction: column;
+          gap: 5px;
+        }
+        .input-group button {
+          width: 100%;
+        }
+        .button-group {
+          flex-direction: column;
+          gap: 8px;
+        }
+        textarea,
+        input[type="number"],
+        input[type="text"],
+        input[readonly] {
+          font-size: 0.9rem;
+          padding: 8px 10px;
+        }
+        .counter {
+          font-size: 0.8rem;
+        }
+        .toggle-container input[type="checkbox"] {
+          width: 32px;
+          height: 18px;
+        }
+        .toggle-container input[type="checkbox"]::before {
+          width: 14px;
+          height: 14px;
+          top: 2px;
+          left: 2px;
+        }
+        .toggle-container input[type="checkbox"]:checked::before {
+          transform: translateX(14px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div id="akunNotification" class="notification"></div>
+        <h2>Login Akun</h2>
+        <textarea
+          id="akunInput"
+          rows="5"
+          placeholder="email:password per baris..."
+        ></textarea>
+        <div class="input-group">
+          <input type="text" id="emailOutput" placeholder="Email" readonly />
+          <button onclick="copyAkun('email')">Copy Email</button>
+        </div>
+        <div class="input-group">
+          <input type="text" id="passOutput" placeholder="Password" readonly />
+          <button onclick="copyAkun('password')">Copy Password</button>
+        </div>
+        <div class="button-group full-width">
+          <button onclick="sliceAkun()">Potong Akun Berikutnya</button>
+        </div>
+        <div class="counter" id="akunTotal">AKUN Tersedia: 0</div>
+      </div>
+
+      <div class="card">
+        <div id="uidNotification" class="notification"></div>
+        <h2>Slice UID</h2>
+        <textarea
+          id="uids"
+          rows="5"
+          placeholder="UID satu per baris..."
+        ></textarea>
+        <input
+          type="number"
+          id="sliceCount"
+          placeholder="Jumlah potongan"
+          min="1"
+          value="10"
+        />
+        <textarea
+          id="result"
+          rows="5"
+          readonly
+          placeholder="Hasil potongan..."
+        ></textarea>
+        <div class="button-group full-width">
+          <button onclick="sliceUIDs()">Slice UID</button>
+          <button onclick="copyUID()">Copy Result UID</button>
+        </div>
+        <div class="counter" id="uidTotal">UIDs Tersisa: 0</div>
+      </div>
+
+      <div class="card">
+        <div id="captionNotification" class="notification"></div>
+        <h2>Random Caption & Link</h2>
+
+        <textarea
+          id="generatedCaption"
+          rows="3"
+          readonly
+          placeholder="Caption dan link yang dihasilkan akan muncul di sini."
+        ></textarea>
+        <div class="toggle-container">
+          <label>
+            <input type="checkbox" id="messageToggle" />
+            Aktifkan untuk "Message Caption"
+          </label>
+        </div>
+        <textarea
+          id="myLink"
+          rows="3"
+          placeholder="Masukkan daftar link, satu per baris.&#10;Contoh:&#10;https://example.com/a&#10;https://example.com/b"
+        ></textarea>
+        <div class="button-group full-width">
+          <button onclick="generateCaption()">Generate Caption</button>
+          <button onclick="copyGeneratedCaption()">Copy Caption</button>
+        </div>
+        <div class="counter" id="captionLinkCount">Link Tersisa: 0</div>
+      </div>
+    </div>
+
+    <script>
+      let akunList = [];
+      let uidList = [];
+      let linkList = [];
+      let notificationTimeout;
+
+      // Fungsi untuk menampilkan notifikasi
+      function showNotification(cardId, message, type = "info") {
+        const notificationElement = document.getElementById(
+          cardId + "Notification"
+        );
+        notificationElement.textContent = message;
+        notificationElement.className = "notification " + type;
+        notificationElement.classList.add("show");
+
+        if (notificationTimeout) {
+          clearTimeout(notificationTimeout);
+        }
+
+        notificationTimeout = setTimeout(() => {
+          notificationElement.classList.remove("show");
+          setTimeout(() => (notificationElement.textContent = ""), 300);
+        }, 3000);
+      }
+
+      // --- Fungsi Akun ---
+      function updateAkunCounter() {
+        const lines = document
+          .getElementById("akunInput")
+          .value.split(/\n+/)
+          .filter(Boolean);
+        document.getElementById("akunTotal").textContent =
+          "AKUN Tersedia: " + lines.length;
+      }
+
+      function sliceAkun() {
+        if (akunList.length === 0) {
+          akunList = document
+            .getElementById("akunInput")
+            .value.split(/\n+/)
+            .filter((x) => x.includes(":"));
+          if (akunList.length === 0) {
+            showNotification(
+              "akun",
+              "Tidak ada data akun yang valid (format: email:password).",
+              "error"
+            );
+            return;
+          }
+        }
+
+        const next = akunList.shift();
+        if (next) {
+          const [email, pass] = next.split(":");
+          document.getElementById("emailOutput").value = email
+            ? email.trim()
+            : "";
+          document.getElementById("passOutput").value = pass ? pass.trim() : "";
+          document.getElementById("akunInput").value = akunList.join("\n");
+          showNotification("akun", "Akun berhasil dipotong.", "success");
+        } else {
+          document.getElementById("emailOutput").value = "";
+          document.getElementById("passOutput").value = "";
+          showNotification("akun", "Semua akun telah dipotong.", "info");
+        }
+        updateAkunCounter();
+      }
+
+      function copyAkun(type) {
+        const id = type === "email" ? "emailOutput" : "passOutput";
+        const val = document.getElementById(id).value;
+        if (!val) {
+          showNotification(
+            "akun",
+            "Tidak ada " + type + " untuk disalin.",
+            "error"
+          );
+          return;
+        }
+        navigator.clipboard
+          .writeText(val)
+          .then(() => {
+            showNotification(
+              "akun",
+              type.charAt(0).toUpperCase() +
+                type.slice(1) +
+                " berhasil disalin!",
+              "success"
+            );
+            document.getElementById(id).value = "";
+          })
+          .catch((err) => {
+            console.error("Gagal menyalin: ", err);
+            showNotification(
+              "akun",
+              "Gagal menyalin " + type + ". Silakan coba lagi.",
+              "error"
+            );
+          });
+      }
+
+      document.getElementById("akunInput").addEventListener("input", () => {
+        akunList = [];
+        updateAkunCounter();
+      });
+
+      // --- Fungsi UID ---
+      function updateUidCounter() {
+        const lines = document
+          .getElementById("uids")
+          .value.split(/\n+/)
+          .filter(Boolean);
+        document.getElementById("uidTotal").textContent =
+          "UIDs Tersisa: " + lines.length;
+      }
+
+      function sliceUIDs() {
+        if (uidList.length === 0) {
+          uidList = document
+            .getElementById("uids")
+            .value.split(/\n+/)
+            .filter(Boolean);
+          if (uidList.length === 0) {
+            showNotification(
+              "uid",
+              "Tidak ada data UID untuk dipotong.",
+              "error"
+            );
+            return;
+          }
+        }
+
+        const count = parseInt(document.getElementById("sliceCount").value);
+        if (isNaN(count) || count <= 0) {
+          showNotification(
+            "uid",
+            "Jumlah potongan tidak valid. Masukkan angka positif.",
+            "error"
+          );
+          return;
+        }
+        if (uidList.length === 0) {
+          showNotification("uid", "Semua UID telah dipotong.", "info");
+          document.getElementById("result").value = "";
+          return;
+        }
+
+        const chunk = uidList.splice(0, count);
+        document.getElementById("result").value = chunk.join("\n");
+        document.getElementById("uids").value = uidList.join("\n");
+        showNotification(
+          "uid",
+          `${chunk.length} UID berhasil dipotong.`,
+          "success"
+        );
+        updateUidCounter();
+      }
+
+      function copyUID() {
+        const val = document.getElementById("result").value;
+        if (!val) {
+          showNotification(
+            "uid",
+            "Tidak ada hasil UID untuk disalin.",
+            "error"
+          );
+          return;
+        }
+        navigator.clipboard
+          .writeText(val)
+          .then(() => {
+            showNotification("uid", "Hasil UID berhasil disalin!", "success");
+            document.getElementById("result").value = "";
+          })
+          .catch((err) => {
+            console.error("Gagal menyalin: ", err);
+            showNotification(
+              "uid",
+              "Gagal menyalin hasil UID. Silakan coba lagi.",
+              "error"
+            );
+          });
+      }
+
+      document.getElementById("uids").addEventListener("input", () => {
+        uidList = [];
+        updateUidCounter();
+      });
+
+      // --- Fungsi Random Caption & Link ---
+      const captionsNormal = [
+        "I could be your favorite hello,\nAnd your naughtiest secret 💋\nLet’s begin → ",
+        "I don’t play hard to get.\nI play to be unforgettable 😈\nSlide in → ",
+        "Sweet lips, wild thoughts 😘\nWanna taste? → ",
+        "You keep watching, I keep teasing 😏\nCome closer → ",
+        "I’m not the one your mama warned you about…\nI’m worse 😈\nMessage me now → ",
+        "One click and I’ll be your new obsession 💦\nLet’s play → ",
+        "I’m the “yes” to all your naughty thoughts 😏\nTalk to me → ",
+        "Touch me with your words first 💬\nTalk dirty to me → ",
+        "I’m soft to look at, hard to resist 😘\nTry me → ",
+        "Come get a little trouble with your pleasure 😈\nTap here → ",
+        "You’ve seen enough... now feel it 💋\nClick here → ",
+        "All dressed up with bad 🔥\nLet’s misbehave → ",
+        "Caution: hot content inside 🔥\nHandle with care → ",
+        "I don’t need much—just your full attention 💋\nLet’s make it personal → ",
+        "I’m not your type.\nI’m your addiction 😈\nYou’ve been warned → ",
+        "Bet your imagination can’t keep up 😉\nLet me take over → ",
+        "You want it soft or rough?\nEither way, message me → ",
+        "A look from me = thoughts you’ll regret later 😘\nDon’t hold back → ",
+        "This heat won’t wait…\nSlide in now → ",
+        "Tonight, I’m your favorite sin 😈\nClaim me → ",
+        "Just a taste… and you’ll crave more 😘\nCome closer → ",
+        "This isn’t just flirting. It’s a warning 💋\nMessage me → ",
+        "I tease. You melt 😏\nTry me → ",
+        "Stop staring. Start tapping 😈\nLet’s talk → ",
+        "Let your fingers do the flirting 💦\nSend that DM → ",
+        "Catch me before I disappear 😘\nTap now → ",
+        "Not for the faint-hearted 💋\nLet’s go wild → ",
+        "Soft voice, dirty mind 😏\nCome explore → ",
+        "Don’t scroll past your fantasy 😈\nClick here → ",
+        "Looking is allowed… touching starts with a message 😘\nSlide in → ",
+        "Some secrets are worth sharing 💋\nLet me be yours → ",
+        "Feisty, flirty, and fully available tonight 😈\nLet’s misbehave → ",
+        "Naughty but sweet enough to bring home 😘\nCome find out → ",
+        "I don’t bite… unless you ask nicely 😏\nMessage me → ",
+        "This body was made for your fantasies 💋\nLet’s begin → ",
+        "Your guilty pleasure is only one message away 😈\nDon’t be shy → ",
+        "You’ve scrolled this far. Must be fate 😉\nLet’s talk → ",
+        "Just enough bad girl to keep you curious 😘\nSlide into my world → ",
+        "Why dream when I’m just one click away? 😏\nMake a move → ",
+        "Let’s skip the small talk 💋\nStart now → ",
+        "My attitude? Naughty by default 😈\nTempt me → ",
+        "This heat? It’s personal 🔥\nDM me → ",
+        "Tonight, let’s blur the lines 😉\nCome play → ",
+        "I flirt like it’s my job 😘\nHire me → ",
+        "One pic, one message… unlimited fun 💋\nTry it → ",
+        "I’m not here to be decent 😈\nLet’s get wicked → ",
+        "Your lips on mine? Just the beginning 😏\nStart with a message → ",
+        "Fantasy in the flesh 😘\nClaim me now → ",
+        "You found me… now dare to talk 💋\nLet’s go → ",
+        "This tease comes with a happy ending 😈\nTap in → ",
+      ];
+
+      const captionsMessage = [
+        "Hey you… yes, you 😘 I’ve got something hot waiting — click and let’s get naughty 🔞👉 ",
+        "Lonely tonight? I’m not… but I could use some *fun* 😈 Click and send me something private 💋👉 ",
+        "Wanna know what a sexy girl like me does after dark? 💄 Find out here 👉 ",
+        "Don’t just stare, babe 👀 I left you a little something — click if you can handle it 🔥👉 ",
+        "I’m not wearing anything… but my smile 😏 Wanna see more? Click me 👉 ",
+        "Let’s skip the small talk and get to the fun part 😈💋 You know where to click 👉 ",
+        "Only for the bold ones 💦 My private contact is waiting — dare to tap it 👉 ",
+        "I’ve been naughty… wanna punish me? 😜 Slide into my private zone 👉 ",
+        "I have a secret… but I only share it in private 💋 Click and let’s talk 👉 ",
+        "I'm feeling a little wild tonight 🐾 Wanna join me? Click me 👉 ",
+        "This isn’t just a link… it’s your ticket to something *deliciously* private 😘👉 ",
+        "I bet you’ve never chatted with a woman like me 😈 Let’s change that 👉 ",
+        "Don’t make me beg... or do 😏 My contact’s waiting 👉 ",
+        "I’m the kind of trouble you’ll love 😇 Click and see why 👉 ",
+        "Let’s misbehave… but privately 😘🔞 Contact me here 👉 ",
+        "Feeling curious? Naughty? Both? 😈 Come play 👉 ",
+        "Touch me… with your message 💌 I’m just one click away 👉 ",
+        "Flirting is fun, but private chats are better 😏 Let’s start here 👉 ",
+        "Your guilty pleasure is just a tap away 🔥 Click now 👉 ",
+        "One message from you could make my night… or yours 😘 Let’s find out 👉 ",
+        "Tempted? You should be 😈 I don’t bite… unless you want me to 👉 ",
+        "A sexy secret is waiting behind this link 💋 Wanna peek? 👉 ",
+        "I know you’ve been thinking about me 👀 Don’t be shy… click 👉 ",
+        "Private. Naughty. Just for you 💦 Ready to chat? 👉 ",
+        "Let’s keep this between us 😘 My contact is ready for you 👉 ",
+        "If you’re looking for sweet… and spicy 🌶️ You’ve found her 👉 ",
+        "Click if you're into curvy, confident, and a little crazy 😉👉 ",
+        "I love attention… especially yours 😍 Give it to me here 👉 ",
+        "Bored? Lonely? Let me fix that 🔥 Let’s talk 👉 ",
+        "This isn’t just a link… it’s an invitation to play 😈👉 ",
+        "If your heart’s racing, don’t worry… mine is too 😘 Let’s connect 👉 ",
+        "Dare to go private with a sexy stranger? 💋 You know what to do 👉 ",
+        "Who needs a dating app when I’m right here? 😏 Click to connect 👉 ",
+        "I’ve been waiting for someone like you… ready to tease me? 👉 ",
+        "Some like it sweet. I like it naughty 😈 Let’s talk 👉 ",
+        "Your wildest chat yet is just one click away 🔥 Don’t resist 👉 ",
+        "I bet you can’t handle me… prove me wrong 😘👉 ",
+        "Sexy. Sultry. All yours — if you dare 👉 ",
+        "Slide into my world 💌 One click, and it's just us 👉 ",
+        "This link leads to pleasure... and maybe a little sin 😈👉 ",
+        "Wanna talk dirty… or sweet? I can do both 😘 Click here 👉 ",
+        "You came here for a reason… I hope it’s me 💋 Contact me 👉 ",
+        "Let me whisper something private… but first, click 👉 ",
+        "The real fun starts after the click 🔥 Don’t keep me waiting 👉 ",
+        "Naughty girls need company too 😇 Come chat 👉 ",
+        "Let's do something we’ll both remember 💋 Start here 👉 ",
+        "I’ve got a surprise waiting just for you 😈 Unwrap it 👉 ",
+        "Hot, honest, and just a little dangerous 😏 Click to connect 👉 ",
+        "Your fantasy? It starts with this click 😘👉 ",
+        "Don’t imagine me… message me 💌 Let’s get personal 👉 ",
+      ];
+
+      function updateCaptionLinkCount() {
+        // Update linkList based on the current content of myLink textarea
+        linkList = document
+          .getElementById("myLink")
+          .value.split(/\n+/)
+          .filter(Boolean);
+        document.getElementById(
+          "captionLinkCount"
+        ).textContent = `Link Tersisa: ${linkList.length}`;
+      }
+
+      function genLink() {
+        // If linkList is empty, re-populate it from the myLink textarea
+        if (linkList.length === 0) {
+          linkList = document
+            .getElementById("myLink")
+            .value.split(/\n+/)
+            .filter(Boolean);
+        }
+
+        if (linkList.length === 0) {
+          return ""; // No links available
+        }
+
+        const item = linkList.shift(); // Get the first link and remove it from the list
+        document.getElementById("myLink").value = linkList.join("\n"); // Update the textarea
+        updateCaptionLinkCount(); // Update the counter
+        return item;
+      }
+
+      function generateCaption() {
+        const isMessageMode = document.getElementById("messageToggle").checked;
+        const captionList = isMessageMode ? captionsMessage : captionsNormal;
+
+        const link = genLink(); // Get a link
+        if (!link) {
+          showNotification(
+            "caption",
+            "Mohon masukkan setidaknya satu link.",
+            "error"
+          );
+          return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * captionList.length);
+        const caption = captionList[randomIndex];
+
+        document.getElementById("generatedCaption").value = caption + link;
+        showNotification(
+          "caption",
+          "Caption berhasil digenerate! 🎉",
+          "success"
+        );
+      }
+
+      function copyGeneratedCaption() {
+        const val = document.getElementById("generatedCaption").value;
+        if (!val) {
+          showNotification(
+            "caption",
+            "Tidak ada caption yang dihasilkan untuk disalin.",
+            "error"
+          );
+          return;
+        }
+        navigator.clipboard
+          .writeText(val)
+          .then(() => {
+            showNotification(
+              "caption",
+              "Caption berhasil disalin! 📋",
+              "success"
+            );
+            document.getElementById("generatedCaption").value = "";
+          })
+          .catch((err) => {
+            console.error("Gagal menyalin: ", err);
+            showNotification(
+              "caption",
+              "Gagal menyalin caption. Silakan coba lagi.",
+              "error"
+            );
+          });
+      }
+
+      // Handler for "Message Caption" toggle
+      document
+        .getElementById("messageToggle")
+        .addEventListener("change", function () {
+          // No need to hide/show textareas since only one generatedCaption textarea is used.
+          // The content of generatedCaption changes based on the selected caption list.
+        });
+
+      document.getElementById("myLink").addEventListener("input", () => {
+        linkList = []; // Reset linkList when the input changes
+        updateCaptionLinkCount();
+      });
+
+      // Initialize counter and display when the page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        updateAkunCounter();
+        updateUidCounter();
+        updateCaptionLinkCount(); // Initial update for links
+        if (!document.getElementById("sliceCount").value) {
+          document.getElementById("sliceCount").value = 10;
+        }
+      });
+    </script>
+  </body>
+</html>
