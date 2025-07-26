@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Threads Caption Generator</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 500px;
+      height: 50PX;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      color: #fff;
+      font-size: 14px;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #ccc;
+    }
+
+    .caption-box {
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+      max-width: 500px;
+      white-space: pre-line;
+      font-size: 15px;
+    }
+
+    .copied {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #8e8e8e;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎲 Threads Caption Generator</h1>
+  <textarea id="captionInput" placeholder="Tulis caption di sini, pisahkan dengan ###..."></textarea>
+  <button onclick="generateCaption()">Generate Random</button>
+
+  <div id="output" class="caption-box" style="display:none;"></div>
+  <div id="copied" class="copied"></div>
+
+  <script>
+    function generateCaption() {
+      const input = document.getElementById("captionInput").value;
+      const blocks = input.trim().split("###").map(c => c.trim()).filter(Boolean);
+
+      if (blocks.length === 0) {
+        alert("Masukkan caption yang dipisahkan dengan ###");
+        return;
+      }
+
+      const random = blocks[Math.floor(Math.random() * blocks.length)];
+      document.getElementById("output").innerText = random;
+      document.getElementById("output").style.display = "block";
+
+      navigator.clipboard.writeText(random)
+        .then(() => {
+          document.getElementById("copied").innerText = "✅ Caption disalin ke clipboard";
+        })
+        .catch(() => {
+          document.getElementById("copied").innerText = "❌ Gagal menyalin caption";
+        });
+    }
+  </script>
+
+</body>
+</html>
