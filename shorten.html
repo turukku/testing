@@ -96,8 +96,8 @@
           <div class="form-group">
             <label for="service">Pilih Shortener:</label>
             <select id="service" class="form-control">
-              <option value="comeac">come.ac</option>
-              <option disabled value="bomso">bom.so</option>
+                <option value="ixsk">ix.sk</option>
+                <option value="comeac">come.ac</option>
               <option disabled value="isgd">is.gd</option>
               <option disabled value="redrme">redr.me</option>
             </select>
@@ -165,8 +165,8 @@
               case "comeac":
                 shortenComeAc(url, appendResult);
                 break;
-              case "bomso":
-                shortenBomSo(url, appendResult);
+              case "ixsk":
+                shortenIxSk(url, appendResult);
                 break;
               case "isgd":
                 shortenIsGd(url, appendResult);
@@ -208,23 +208,30 @@
         xhr.send("url=" + encodeURIComponent(url));
       }
 
-      function shortenBomSo(url, callback) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "https://bom.so/api/shorten", true);
-        xhr.setRequestHeader(
-          "Content-Type",
-          "application/x-www-form-urlencoded"
-        );
-        xhr.onload = () => {
-          callback(
-            xhr.status === 200
-              ? "✅ " + xhr.responseText
-              : "❌ Error: " + xhr.status
-          );
-        };
-        xhr.onerror = () => callback("❌ Network error.");
-        xhr.send("url=" + encodeURIComponent(url));
-      }
+      function shortenIxSk(url, callback) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "https://ix.sk/", true);
+            xhr.setRequestHeader(
+                "Content-Type",
+                "application/x-www-form-urlencoded"
+            );
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    try {
+                        let doc = new DOMParser().parseFromString(xhr.responseText, "text/html");
+                        let shortUrl = doc.querySelector(".shorturl")?.value || "❌ Gagal ambil URL";
+                        callback(shortUrl); // kirim hasil ke appendResult()
+                    } catch (e) {
+                        callback("❌ Parsing error");
+                    }
+                } else {
+                    callback("❌ Error: " + xhr.status);
+                }
+            };
+            xhr.onerror = () => callback("❌ Network error.");
+            xhr.send("longurl=" + encodeURIComponent(url) + "&action=create");
+        }
+
 
       function shortenIsGd(url, callback) {
         const xhr = new XMLHttpRequest();
