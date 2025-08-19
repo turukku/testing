@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slug Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f3f4f6;
+            --card-bg: #fff;
+            --border: #e5e7eb;
+            --radius: 18px;
+            --shadow: 0 6px 32px rgba(37,99,235,0.09);
+            --input-bg: #f9fafb;
+            --input-focus: #e0e7ff;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            min-height: 100vh;
+            margin: 0;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', Arial, sans-serif;
+        }
+        .container {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2.5rem 2.2rem 2rem 2.2rem;
+            max-width: 420px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.3rem;
+            border: 1px solid var(--border);
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            color: var(--primary);
+            text-align: center;
+            letter-spacing: -1px;
+        }
+        .note {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 0.5rem 0.7rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        label {
+            font-size: 1rem;
+            color: #334155;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            letter-spacing: 0.01em;
+        }
+        input[type="text"], input[type="number"] {
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background: var(--input-bg);
+            transition: border 0.2s, background 0.2s;
+            font-family: inherit;
+        }
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--primary);
+            background: var(--input-focus);
+            outline: none;
+        }
+        textarea {
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            background: var(--input-bg);
+            min-height: 110px;
+            resize: vertical;
+            transition: border 0.2s, background 0.2s;
+            font-family: inherit;
+        }
+        textarea:focus {
+            border-color: var(--primary);
+            background: var(--input-focus);
+            outline: none;
+        }
+        .actions {
+            display: flex;
+            gap: 0.7rem;
+            justify-content: flex-end;
+        }
+        button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0.7rem 1.4rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.07);
+            font-family: inherit;
+        }
+        button:hover, button:focus {
+            background: var(--primary-hover);
+        }
+        .actions button:last-child {
+            background: #f1f5f9;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            box-shadow: none;
+        }
+        .actions button:last-child:hover, .actions button:last-child:focus {
+            background: #e0e7ff;
+        }
+        #result {
+            margin-top: 0.2rem;
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            font-size: 0.98rem;
+            color: #334155;
+            background: #f8fafc;
+        }
+        footer {
+            margin-top: 0.7rem;
+            text-align: center;
+        }
+        .footer-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+            letter-spacing: 0.01em;
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.1rem;
+                max-width: 98vw;
+            }
+            h1 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Slug Generator</h1>
+        <div class="note">Tetap Menyerah Gaboleh Semangat...!</div>
+        <div class="form-group">
+            <label for="slug">Slug <span style="color:#f43f5e">*</span></label>
+            <input type="text" id="slug" placeholder="e.g. FOX07" autocomplete="off" onfocus="this.select()" value="FOX07">
+        </div>
+        <div class="form-group">
+            <label for="url">Destination URL <span style="color:#f43f5e">*</span></label>
+            <input type="text" style="cursor: pointer;" disabled id="url" value="https://camsteronline1.netlify.app/" placeholder="e.g. https://google.com/" autocomplete="off" onfocus="this.select()">
+        </div>
+        <div class="form-group">
+            <label for="number">How many links?</label>
+            <input type="number" id="number" placeholder="1" value="1" min="1" max="1000" onfocus="this.select()">
+        </div>
+        <div class="actions">
+            <button id="generate" onclick="srit()">Generate</button>
+            <button type="button" onclick="copyResult()">Copy</button>
+        </div>
+        <textarea id="result" placeholder="Result will appear here..."  onfocus="this.select()"></textarea>
+        <footer>
+            <div class="footer-text">Made with <span style="color:#f43f5e;">&#10084;</span> by LSC</div>
+        </footer>
+    </div>
+    <script>
+        function randomString(length) {
+            const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+        function srit() {
+            const slug = document.getElementById('slug').value.trim();
+            const url = document.getElementById('url').value.trim();
+            const number = parseInt(document.getElementById('number').value, 10) || 1;
+            let result = '';
+
+            if (!slug || !url) {
+                document.getElementById('result').value = 'Isi semua field yang wajib diisi.';
+                return;
+            }
+
+            for (let i = 1; i <= number; i++) {
+                const rand = randomString(50);
+                result += `${url}?slug=${encodeURIComponent(slug)}&r=${rand}\n`;
+            }
+
+            document.getElementById('result').value = result.trim();
+        }
+
+        function copyResult() {
+            const resultTextArea = document.getElementById('result');
+            resultTextArea.select();
+            document.execCommand('copy');
+        }
+    </script>
+</body>
+</html>
