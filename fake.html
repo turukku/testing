@@ -1,138 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fake Name Generator</title>
     <style>
-                body {
-            background-color: #1b1b1b;
-            color: #ffffff;
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+      body {
+        background-color: #1b1b1b;
+        color: #ffffff;
+        font-family: "Arial", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
 
-        .container {
-            text-align: center;
-            background-color: #262626;
-            border: 2px solid #4caf50;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            max-width: 400px;
-        }
+      .container {
+        text-align: center;
+        background-color: #262626;
+        border: 2px solid #4caf50;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+      }
 
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #4caf50;
-        }
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #4caf50;
+      }
 
-        button {
-            background-color: #4caf50;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+      button {
+        background-color: #4caf50;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-        button:hover {
-            background-color: #3e8e41;
-        }
+      button:hover {
+        background-color: #3e8e41;
+      }
 
-        .input-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
+      .input-group {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+      }
 
-        .fake-data {
-            margin-right: 10px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #4caf50;
-            border-radius: 5px;
-            background-color: #1b1b1b;
-            color: #ffffff;
-            width: 100%;
-            max-width: 250px;
-        }
+      .fake-data {
+        margin-right: 10px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #4caf50;
+        border-radius: 5px;
+        background-color: #1b1b1b;
+        color: #ffffff;
+        width: 100%;
+        max-width: 250px;
+      }
 
-        .copy-btn {
-            background-color: #4caf50;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+      .copy-btn {
+        background-color: #4caf50;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-        .copy-btn:hover {
-            background-color: #3e8e41;
-        }
+      .copy-btn:hover {
+        background-color: #3e8e41;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Fake Name Generator</h1>
-        <button onclick="generate()">Generate Name</button>
-        <div class="input-group">
-            <input type="text" class="fake-data" id="fakeName" readonly>
-            <button class="copy-btn" onclick="copyToClipboard('fakeName')">Copy</button>
-        </div>
-        <div class="input-group">
-            <input type="text" class="fake-data" id="username" readonly>
-            <button class="copy-btn" onclick="copyToClipboard('username')">Copy</button>
-        </div>
-        <div class="input-group">
-            <input type="text" class="fake-data" id="email" readonly>
-            <button class="copy-btn" onclick="copyToClipboard('email')">Copy</button>
-        </div>
-        <div class="input-group">
-            <input type="text" class="fake-data" id="pasword" value="X_onetwotree" readonly>
-            <button class="copy-btn" onclick="copyToClipboard('pasword')">Copy</button>
-        </div>
+      <h1>Fake Name Generator</h1>
+      <button onclick="generate()">Generate Name</button>
+      <div class="input-group">
+        <input type="text" class="fake-data" id="fakeName" readonly />
+        <button class="copy-btn" onclick="copyToClipboard('fakeName')">
+          Copy
+        </button>
+      </div>
+      <div class="input-group">
+        <input type="text" class="fake-data" id="username" readonly />
+        <button class="copy-btn" onclick="copyToClipboard('username')">
+          Copy
+        </button>
+      </div>
+      <div class="input-group">
+        <input type="text" class="fake-data" id="email" readonly />
+        <button class="copy-btn" onclick="copyToClipboard('email')">
+          Copy
+        </button>
+      </div>
+      <div class="input-group">
+        <input
+          type="text"
+          class="fake-data"
+          id="pasword"
+          value="X_onetwotree"
+        />
+        <button class="copy-btn" onclick="copyToClipboard('pasword')">
+          Copy
+        </button>
+      </div>
+      <button style="margin-top: 1.2rem" onclick="copyAllData()">
+        Copy All Data
+      </button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
     <script>
-    function generate() {
-        const firstName = faker.name.firstName('female');
+      function generate() {
+        faker.locale = "it"; // Set locale to Indonesian
+        const firstName = faker.name.firstName("female");
         const lastName = faker.name.lastName();
         const randomNumber = Math.floor(Math.random() * 1000); // Generate random number up to 999
         const u = `${firstName}_${lastName}${randomNumber}`;
         const e = `${firstName}_${lastName}${randomNumber}@mailto.plus`;
         const username = u.toLowerCase();
         const email = e.toLowerCase();
-        
 
-        document.getElementById('fakeName').value = `${firstName} ${lastName}`;
-        document.getElementById('username').value = username;
-        document.getElementById('email').value = email;
-    }
+        document.getElementById("fakeName").value = `${firstName} ${lastName}`;
+        document.getElementById("username").value = username;
+        document.getElementById("email").value = email;
+      }
 
-
-    function copyToClipboard(elementId) {
+      function copyToClipboard(elementId) {
         const inputField = document.getElementById(elementId);
         inputField.select();
         inputField.setSelectionRange(0, 99999); // For mobile devices
         navigator.clipboard.writeText(inputField.value).then(() => {
-            console.log('Sukses: ' + inputField.value);
+          console.log("Sukses: " + inputField.value);
         });
-    }
+      }
 
+      function copyAllData() {
+        const fakeName = document.getElementById("fakeName").value;
+        const username = document.getElementById("username").value;
+        const email = document.getElementById("email").value;
+        const pasword = document.getElementById("pasword").value;
 
+        const allData = `${username}\t${pasword}\t${email}\t${fakeName}`;
 
+        navigator.clipboard.writeText(allData).then(() => {
+          console.log("All data copied to clipboard");
+        });
+      }
     </script>
-</body>
+  </body>
 </html>
-
