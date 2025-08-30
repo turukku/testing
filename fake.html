@@ -80,6 +80,19 @@
       .copy-btn:hover {
         background-color: #3e8e41;
       }
+      .openmail {
+        background-color: #4caf50;
+        margin-right: 10px;
+      }
+      .openmail:hover {
+        background-color: #3e8e41;
+      }
+      .copyAllData {
+        background-color: #4caf50;
+      }
+      .copyAllData:hover {
+        background-color: #3e8e41;
+      }
     </style>
   </head>
   <body>
@@ -115,9 +128,14 @@
           Copy
         </button>
       </div>
-      <button style="margin-top: 1.2rem" onclick="copyAllData()">
-        Copy All Data
-      </button>
+      <div class="input-group">
+        <button class="copy-btn openmail" onclick="openmail()">
+          Open Mail
+        </button>
+        <button class="copy-btn copyAllData" onclick="copyAllData()">
+          Copy All Data
+        </button>
+      </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/faker@5.5.3/dist/faker.min.js"></script>
     <script>
@@ -156,6 +174,11 @@
         navigator.clipboard.writeText(allData).then(() => {
           console.log("All data copied to clipboard");
         });
+      }
+      function openmail() {
+        const email = document.getElementById("username").value;
+        const mailtoLink = `https://tempmail.plus/en/#`;
+        window.open(mailtoLink, "_blank");
       }
     </script>
   </body>
